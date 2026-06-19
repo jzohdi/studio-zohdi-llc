@@ -1,0 +1,15 @@
+---
+description: Standards for building the Studio Zohdi marketing site
+alwaysApply: true
+---
+
+# Studio Zohdi Website Standards
+
+- Treat supplied screenshots and written behavior notes as the source of truth. Match layout, spacing, hierarchy, and responsive behavior closely.
+- Build desktop and mobile together so both views stay aligned as sections evolve.
+- Keep implementation maintainable: prefer typed data, reusable components, global design tokens, and clear file organization over one-off markup.
+- Do not invent brand assets, portfolio facts, links, or behavior when details are unclear. Use placeholders only when necessary and mark them clearly in docs or data.
+- Use motion intentionally. Favor subtle, premium-feeling transitions, hover states, and page polish over flashy animation.
+- Respect `prefers-reduced-motion` and keep motion from blocking readability or navigation.
+- Preserve accessibility and SEO: semantic HTML, keyboard support, descriptive alt text, strong contrast, and unique page titles/meta.
+- Prefer imported assets and centralized data structures so future portfolio assets can be swapped in with minimal code changes.
