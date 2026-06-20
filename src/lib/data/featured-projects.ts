@@ -5,6 +5,8 @@ export type ProjectStatus = 'live' | 'planned';
 export type FeaturedProject = {
 	id: string;
 	name: string;
+	/** Display title split into the lines it should break onto in the large desktop list. */
+	nameLines: string[];
 	summary: string;
 	status: ProjectStatus;
 	website?: string;
@@ -17,6 +19,7 @@ export const featuredProjects: FeaturedProject[] = [
 	{
 		id: 'foia-search',
 		name: 'FOIA SEARCH',
+		nameLines: ['FOIA SEARCH'],
 		summary: 'Live site: foiasearch.com',
 		status: 'live',
 		website: 'https://foiasearch.com',
@@ -27,6 +30,7 @@ export const featuredProjects: FeaturedProject[] = [
 	{
 		id: 'stock-promotion-tracker',
 		name: 'STOCK PROMOTION TRACKER',
+		nameLines: ['STOCK', 'PROMOTION', 'TRACKER'],
 		summary: 'Live site: stockpromotiontracker.com',
 		status: 'live',
 		website: 'https://stockpromotiontracker.com',
@@ -37,6 +41,7 @@ export const featuredProjects: FeaturedProject[] = [
 	{
 		id: 'stop-nasdaq-china-fraud',
 		name: 'STOP NASDAQ CHINA FRAUD',
+		nameLines: ['STOP NASDAQ', 'CHINA FRAUD'],
 		summary: 'Live site: stopnasdaqchinafraud.com',
 		status: 'live',
 		website: 'https://stopnasdaqchinafraud.com',
@@ -47,6 +52,7 @@ export const featuredProjects: FeaturedProject[] = [
 	{
 		id: 'highgroundresearch',
 		name: 'HIGH GROUND RESEARCH',
+		nameLines: ['HIGH GROUND', 'RESEARCH'],
 		summary: 'Live site: highgroundresearch.com',
 		status: 'live',
 		website: 'https://highgroundresearch.com',
@@ -57,6 +63,7 @@ export const featuredProjects: FeaturedProject[] = [
 	{
 		id: 'greffier',
 		name: 'GREFFIER',
+		nameLines: ['GREFFIER'],
 		summary: 'Local-first meeting transcription desktop app. Website coming later.',
 		status: 'planned',
 		previewLabel: 'greffier',
@@ -66,6 +73,7 @@ export const featuredProjects: FeaturedProject[] = [
 	{
 		id: '8ksearch',
 		name: '8KSEARCH',
+		nameLines: ['8KSEARCH'],
 		summary: 'Live site: 8ksearch.com',
 		status: 'live',
 		website: 'https://8ksearch.com',

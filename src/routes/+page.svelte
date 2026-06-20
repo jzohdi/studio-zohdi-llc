@@ -111,17 +111,22 @@
 					onpointermove={handleDesktopPointerMove}
 					onpointerleave={hideHoverTag}
 				>
-					{#each featuredProjects as project (project.id)}
+					{#each featuredProjects as project, index (project.id)}
 						<button
 							type="button"
 							class={`project-button ${project.id === activeProjectId ? 'is-active' : ''}`}
 							id={`project-trigger-${project.id}`}
+							style:grid-row={index + 1}
 							aria-pressed={project.id === activeProjectId}
 							onclick={() => setActiveProject(project.id)}
 							onfocus={() => setActiveProject(project.id)}
 							onpointerenter={(event) => handleProjectPointerEnter(project.id, event)}
 						>
-							<span class="project-button__name">{project.name}</span>
+							<span class="project-button__name">
+								{#each project.nameLines as line (line)}
+									<span class="project-button__line">{line}</span>
+								{/each}
+							</span>
 						</button>
 					{/each}
 
@@ -129,18 +134,20 @@
 						class="desktop-showcase__stage"
 						aria-labelledby={`project-trigger-${activeProject.id}`}
 					>
-						{#each featuredProjects as project (project.id)}
-							<article
-								class={`stage-panel ${project.id === activeProjectId ? 'is-active' : ''}`}
-								aria-hidden={project.id !== activeProjectId}
-							>
-								<ProjectPreviewCard
-									{project}
-									size="desktop"
-									isActive={project.id === activeProjectId}
-								/>
-							</article>
-						{/each}
+						<div class="desktop-showcase__stage-track">
+							{#each featuredProjects as project (project.id)}
+								<article
+									class={`stage-panel ${project.id === activeProjectId ? 'is-active' : ''}`}
+									aria-hidden={project.id !== activeProjectId}
+								>
+									<ProjectPreviewCard
+										{project}
+										size="desktop"
+										isActive={project.id === activeProjectId}
+									/>
+								</article>
+							{/each}
+						</div>
 					</div>
 				</div>
 
@@ -261,18 +268,16 @@
 	.desktop-showcase {
 		--showcase-stage-width: clamp(23rem, 29vw, 28.25rem);
 		--showcase-gap: clamp(1rem, 2.4vw, 1.9rem);
-		--showcase-min-height: clamp(22rem, 31vw, 27rem);
 
 		position: relative;
 	}
 
 	.desktop-showcase__surface {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(23rem, var(--showcase-stage-width));
-		grid-template-rows: repeat(var(--project-count), minmax(0, 1fr));
+		grid-template-columns: minmax(0, 1fr) var(--showcase-stage-width);
+		grid-template-rows: repeat(var(--project-count), auto);
 		column-gap: var(--showcase-gap);
-		align-items: stretch;
-		min-height: var(--showcase-min-height);
+		align-content: start;
 	}
 
 	.mobile-showcase__list {
@@ -286,11 +291,11 @@
 		position: relative;
 		z-index: 2;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(23rem, var(--showcase-stage-width));
+		grid-template-columns: minmax(0, 1fr) var(--showcase-stage-width);
 		column-gap: var(--showcase-gap);
-		align-items: center;
+		align-items: start;
 		width: 100%;
-		min-height: 100%;
+		padding-block: 0.1rem;
 		text-align: left;
 		color: hsl(var(--foreground) / 0.18);
 		cursor: pointer;
@@ -306,30 +311,38 @@
 	.project-button__name {
 		grid-column: 1;
 		display: block;
-		width: max-content;
+	}
+
+	.project-button__line {
+		display: block;
 		font-family: var(--font-display);
-		font-size: clamp(2.15rem, 4vw, 4rem);
+		font-size: 5.25rem;
 		font-weight: 700;
-		line-height: 0.92;
-		letter-spacing: -0.05em;
+		line-height: 0.86;
+		letter-spacing: -0.04em;
 		transition: transform 220ms ease;
 	}
 
-	.project-button:hover .project-button__name,
-	.project-button:focus-visible .project-button__name,
-	.project-button.is-active .project-button__name {
+	.project-button:hover .project-button__line,
+	.project-button:focus-visible .project-button__line,
+	.project-button.is-active .project-button__line {
 		transform: translateX(0.12rem);
 	}
 
 	.desktop-showcase__stage {
-		grid-column: 2;
-		grid-row: 1 / -1;
-		position: relative;
+		position: fixed;
+		top: 50svh;
+		right: calc((100vw - min(100vw, var(--page-max-width))) / 2 + var(--page-padding-inline));
+		width: var(--showcase-stage-width);
+		transform: translateY(-50%);
 		z-index: 1;
+		pointer-events: none;
+	}
+
+	.desktop-showcase__stage-track {
 		display: grid;
 		justify-items: end;
 		align-items: center;
-		pointer-events: none;
 	}
 
 	.stage-panel {
@@ -468,7 +481,7 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.project-button,
-		.project-button__name,
+		.project-button__line,
 		.stage-panel,
 		.desktop-hover-tag {
 			transition-duration: 0ms;
