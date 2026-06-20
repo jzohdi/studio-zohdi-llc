@@ -13,7 +13,10 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "npm run test:unit -- --run",
+		"video:dev": "npm --prefix remotion run dev",
+		"video:compositions": "npm --prefix remotion run compositions",
+		"video:render": "npm --prefix remotion run render --"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

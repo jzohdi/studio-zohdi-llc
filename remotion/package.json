@@ -1,0 +1,24 @@
+{
+	"name": "@studio-zohdi/remotion",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "remotion studio src/index.ts",
+		"compositions": "remotion compositions src/index.ts",
+		"render": "remotion render src/index.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@remotion/cli": "^4.0.481",
+		"@remotion/google-fonts": "^4.0.481",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"remotion": "^4.0.481"
+	},
+	"devDependencies": {
+		"@types/node": "^22.19.21",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"typescript": "^6.0.3"
+	}
+}
