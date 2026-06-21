@@ -28,6 +28,7 @@ pnpm lint
 pnpm build
 pnpm preview
 pnpm test
+pnpm carousel:publish foia-search
 pnpm video:publish foia-search
 ```
 
@@ -39,6 +40,9 @@ pnpm video:publish foia-search
 - `src/app.css`: global design tokens, theme variables, resets, shared utilities
 - `src/lib/components/home/`: homepage-specific reusable Svelte components
 - `src/lib/data/featured-projects.ts`: centralized featured project content used by desktop and mobile layouts; currently seeded with the live portfolio lineup plus Greffier as an upcoming product
+- `remotion/README.md`: workflow guide for editing the shared preview manifest, exporting homepage carousel assets, and rendering Remotion videos
+- `remotion/src/data/project-preview-manifest.json`: source-of-truth preview manifest for both Remotion videos and exported homepage carousel assets
+- `src/lib/generated/project-preview-carousel.ts`: generated map of homepage carousel scenes and mobile poster images copied from Remotion assets
 - `src/lib/generated/project-preview-media.ts`: generated map of published desktop preview videos, poster frames, and sources
 - `src/lib/utils/theme.ts`: theme resolution, persistence, and DOM application helpers
 - `docs/site-spec.md`: living design and implementation reference for brand, layout, and motion decisions

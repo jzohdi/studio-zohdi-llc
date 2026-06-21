@@ -1,0 +1,142 @@
+{
+	"foiaSearch": {
+		"projectId": "foia-search",
+		"palette": {
+			"backgroundStart": "#edf8f7",
+			"backgroundEnd": "#d7ebe6",
+			"glow": "rgba(17, 140, 122, 0.24)",
+			"highlight": "#118c7a",
+			"surface": "rgba(244, 251, 249, 0.84)",
+			"border": "rgba(17, 97, 93, 0.18)",
+			"label": "#124c4a"
+		},
+		"defaults": {
+			"screenshotDurationInSeconds": 1.9,
+			"transitionDurationInSeconds": 0.7
+		},
+		"desktopScreenshots": [
+			{
+				"path": "projects/foia-search/desktop_1.png",
+				"durationInSeconds": 3.2,
+				"fit": "contain",
+				"label": "Homepage Overview"
+			},
+			{
+				"path": "projects/foia-search/desktop_2.png",
+				"durationInSeconds": 4.2,
+				"fit": "contain",
+				"label": "Search Results Detail"
+			}
+		],
+		"desktopScreenRecordings": [
+			{
+				"path": "projects/foia-search/desktop_recording_1.mp4",
+				"durationInSeconds": 6,
+				"fit": "contain",
+				"label": "Instantly Find B7A Requests"
+			}
+		],
+		"mobileScreenshots": [
+			{
+				"path": "projects/foia-search/mobile_1.png",
+				"durationInSeconds": 3.2,
+				"fit": "contain",
+				"label": "Mobile Results View"
+			},
+			{
+				"path": "projects/foia-search/mobile_2.png",
+				"durationInSeconds": 4.2,
+				"fit": "contain",
+				"label": "Email Alerts Based on Search Results"
+			}
+		],
+		"mobileScreenRecordings": [
+			{
+				"path": "projects/foia-search/mobile_recording_1.mp4",
+				"durationInSeconds": 4.2,
+				"fit": "contain"
+			}
+		],
+		"textFrames": [
+			{
+				"text": "Find Ongoing SEC Investigations",
+				"duration": 1.6
+			},
+			{
+				"text": "Instantly Query All FOIA Requests",
+				"duration": 1.6
+			},
+			{
+				"text": "Recieve Email Alerts When New Requests Match Your Search",
+				"duration": 1.6
+			}
+		],
+		"timeline": [
+			{
+				"collection": "textFrames",
+				"index": 0
+			},
+			{
+				"collection": "mobileScreenshots",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 1
+			},
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 2
+			},
+			{
+				"collection": "mobileScreenRecordings",
+				"index": 0
+			}
+		],
+		"homepage": {
+			"mobilePoster": {
+				"collection": "mobileScreenshots",
+				"index": 0
+			}
+		}
+	},
+	"stockPromotionTracker": {
+		"projectId": "stock-promotion-tracker",
+		"desktopScreenshots": [],
+		"desktopScreenRecordings": [],
+		"mobileScreenshots": [],
+		"mobileScreenRecordings": []
+	},
+	"stopNasdaqChinaFraud": {
+		"projectId": "stop-nasdaq-china-fraud",
+		"desktopScreenshots": [],
+		"desktopScreenRecordings": [],
+		"mobileScreenshots": [],
+		"mobileScreenRecordings": []
+	},
+	"highGroundResearch": {
+		"projectId": "highgroundresearch",
+		"desktopScreenshots": [],
+		"desktopScreenRecordings": [],
+		"mobileScreenshots": [],
+		"mobileScreenRecordings": []
+	},
+	"greffier": {
+		"projectId": "greffier",
+		"desktopScreenshots": [],
+		"desktopScreenRecordings": [],
+		"mobileScreenshots": [],
+		"mobileScreenRecordings": []
+	},
+	"search8k": {
+		"projectId": "8ksearch",
+		"desktopScreenshots": [],
+		"desktopScreenRecordings": [],
+		"mobileScreenshots": [],
+		"mobileScreenRecordings": []
+	}
+}

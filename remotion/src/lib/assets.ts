@@ -1,4 +1,5 @@
 import { staticFile } from 'remotion';
+import projectAssetManifestJson from '../data/project-preview-manifest.json';
 import {
 	getMotionProject,
 	mergeMotionPalette,
@@ -35,6 +36,11 @@ export type TextFrameInput = {
 	duration: number;
 };
 
+export type MobilePosterReference = {
+	collection: 'desktopScreenshots' | 'mobileScreenshots';
+	index: number;
+};
+
 type TimelineReference = {
 	collection: AssetCollectionName;
 	index: number;
@@ -44,6 +50,10 @@ type ProjectAssetDefaults = {
 	screenshotDurationInSeconds?: number;
 	recordingDurationInSeconds?: number;
 	transitionDurationInSeconds?: number;
+};
+
+type ProjectHomepageConfig = {
+	mobilePoster?: MobilePosterReference;
 };
 
 type ResolvedProjectAssetDefaults = {
@@ -63,7 +73,10 @@ export type ProjectAssetConfig = {
 	textFrames?: TextFrameInput[];
 	textFrame?: TextFrameInput[];
 	timeline?: TimelineReference[];
+	homepage?: ProjectHomepageConfig;
 };
+
+export type ProjectAssetManifest = Record<string, ProjectAssetConfig>;
 
 export type ResolvedProjectScene = {
 	id: string;
@@ -125,7 +138,10 @@ const sceneLabels: Record<AssetCollectionName, string> = {
 };
 
 const normalizeAssetPath = (value: string): string => {
-	const normalized = value.replace(/\\/g, '/').trim().replace(/^\.?\//, '');
+	const normalized = value
+		.replace(/\\/g, '/')
+		.trim()
+		.replace(/^\.?\//, '');
 
 	return normalized.startsWith('http://') || normalized.startsWith('https://')
 		? normalized
@@ -252,7 +268,10 @@ const buildAutoTimeline = (
 	collections: Record<AssetCollectionName, ResolvedProjectScene[]>
 ): TimelineReference[] => {
 	const references: TimelineReference[] = [];
-	const maxLength = Math.max(...collectionOrder.map((collection) => collections[collection].length), 0);
+	const maxLength = Math.max(
+		...collectionOrder.map((collection) => collections[collection].length),
+		0
+	);
 
 	for (let index = 0; index < maxLength; index += 1) {
 		for (const collection of collectionOrder) {
@@ -313,111 +332,7 @@ const getTransitionDurationInFrames = (config: ProjectAssetConfig | null, fps: n
 	);
 };
 
-export const projectAssetManifest = {
-	foiaSearch: {
-		projectId: 'foia-search',
-		palette: {
-			backgroundStart: '#edf8f7',
-			backgroundEnd: '#d7ebe6',
-			glow: 'rgba(17, 140, 122, 0.24)',
-			highlight: '#118c7a',
-			surface: 'rgba(244, 251, 249, 0.84)',
-			border: 'rgba(17, 97, 93, 0.18)',
-			label: '#124c4a'
-		},
-		defaults: {
-			screenshotDurationInSeconds: 1.9,
-			transitionDurationInSeconds: 0.7
-		},
-		desktopScreenshots: [
-			{
-				path: 'projects/foia-search/desktop_1.png',
-				durationInSeconds: 3.2,
-				fit: 'contain',
-				label: 'Homepage Overview'
-			},
-			{
-				path: 'projects/foia-search/desktop_2.png',
-				durationInSeconds: 4.2,
-				fit: 'contain',
-				label: 'Search Results Detail'
-			}
-		],
-		desktopScreenRecordings: [
-			{
-				path: 'projects/foia-search/desktop_recording_1.mp4',
-				durationInSeconds: 6,
-				fit: 'contain',
-				label: 'Instantly Find B7A Requests'
-			}
-		],
-		mobileScreenshots: [
-			{
-				path: 'projects/foia-search/mobile_1.png',
-				durationInSeconds: 3.2,
-				fit: 'contain',
-				label: 'Mobile Results View'
-			},
-			{
-				path: 'projects/foia-search/mobile_2.png',
-				durationInSeconds: 4.2,
-				fit: 'contain',
-				label: 'Email Alerts Based on Search Results'
-			}
-		],
-		mobileScreenRecordings: [],
-		textFrames: [{ text: 'Find Ongoing SEC Investigations', duration: 1.6 }, {
-			text: 'Instantly Query All FOIA Requests',
-			duration: 1.6
-		}, {
-			text: "Recieve Email Alerts When New Requests Match Your Search",
-			duration: 1.6
-		}],
-		timeline: [
-			{ collection: 'textFrames', index: 0 },
-			{ collection: 'mobileScreenshots', index: 0 },
-			{ collection: 'textFrames', index: 1 },
-			{ collection: 'desktopScreenRecordings', index: 0 },
-			{ collection: 'textFrames', index: 2 },
-			{ collection: 'mobileScreenshots', index: 1 }
-		]
-	},
-	stockPromotionTracker: {
-		projectId: 'stock-promotion-tracker',
-		desktopScreenshots: [],
-		desktopScreenRecordings: [],
-		mobileScreenshots: [],
-		mobileScreenRecordings: []
-	},
-	stopNasdaqChinaFraud: {
-		projectId: 'stop-nasdaq-china-fraud',
-		desktopScreenshots: [],
-		desktopScreenRecordings: [],
-		mobileScreenshots: [],
-		mobileScreenRecordings: []
-	},
-	highGroundResearch: {
-		projectId: 'highgroundresearch',
-		desktopScreenshots: [],
-		desktopScreenRecordings: [],
-		mobileScreenshots: [],
-		mobileScreenRecordings: []
-	},
-	greffier: {
-		projectId: 'greffier',
-		desktopScreenshots: [],
-		desktopScreenRecordings: [],
-		mobileScreenshots: [],
-		mobileScreenRecordings: []
-	},
-	search8k: {
-		projectId: '8ksearch',
-		desktopScreenshots: [],
-		desktopScreenRecordings: [],
-		mobileScreenshots: [],
-		mobileScreenRecordings: []
-	}
-} satisfies Record<string, ProjectAssetConfig>;
+export const projectAssetManifest = projectAssetManifestJson as ProjectAssetManifest;
 
 export const getProjectTimeline = (projectId: string, fps: number): ProjectTimeline => {
 	const project = getMotionProject(projectId);
@@ -445,10 +360,14 @@ export const getProjectTimeline = (projectId: string, fps: number): ProjectTimel
 		mobileScreenRecordings: (config?.mobileScreenRecordings ?? []).map((asset, index) =>
 			buildResolvedScene('mobileScreenRecordings', index, asset, fps, timings)
 		),
-		textFrames: configuredTextFrames.map((frame, index) => buildResolvedTextScene(index, frame, fps))
+		textFrames: configuredTextFrames.map((frame, index) =>
+			buildResolvedTextScene(index, frame, fps)
+		)
 	};
 
-	const timelineReferences = config?.timeline?.length ? config.timeline : buildAutoTimeline(collections);
+	const timelineReferences = config?.timeline?.length
+		? config.timeline
+		: buildAutoTimeline(collections);
 	const scenes = timelineReferences
 		.map((reference) => collections[reference.collection][reference.index] ?? null)
 		.filter((scene): scene is ResolvedProjectScene => Boolean(scene));
@@ -456,9 +375,9 @@ export const getProjectTimeline = (projectId: string, fps: number): ProjectTimel
 	const maxTransitionDurationInFrames =
 		normalizedScenes.length > 1
 			? Math.max(
-				0,
-				Math.min(...normalizedScenes.map((scene) => Math.max(1, scene.durationInFrames - 1)))
-			)
+					0,
+					Math.min(...normalizedScenes.map((scene) => Math.max(1, scene.durationInFrames - 1)))
+				)
 			: 0;
 	const transitionDurationInFrames = Math.min(
 		getTransitionDurationInFrames(config, fps),

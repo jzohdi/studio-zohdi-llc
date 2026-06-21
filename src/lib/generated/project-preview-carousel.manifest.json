@@ -1,0 +1,99 @@
+{
+	"foia-search": {
+		"mobilePoster": {
+			"label": "Mobile Results View",
+			"fit": "contain",
+			"path": "/project-previews/foia-search/carousel/assets/mobile_1.png",
+			"type": "image/png",
+			"width": 752,
+			"height": 1336,
+			"aspectRatio": 0.562874251497006
+		},
+		"scenes": [
+			{
+				"id": "textFrames-0",
+				"kind": "text",
+				"label": "Text Frame 01",
+				"text": "Find Ongoing SEC Investigations",
+				"fit": "contain",
+				"surface": "text",
+				"mediaType": "text",
+				"durationInMs": 1600,
+				"source": null
+			},
+			{
+				"id": "mobileScreenshots-0",
+				"kind": "image",
+				"label": "Mobile Results View",
+				"text": null,
+				"fit": "contain",
+				"surface": "mobile",
+				"mediaType": "screenshot",
+				"durationInMs": 3200,
+				"source": {
+					"path": "/project-previews/foia-search/carousel/assets/mobile_1.png",
+					"type": "image/png",
+					"width": 752,
+					"height": 1336,
+					"aspectRatio": 0.562874251497006
+				}
+			},
+			{
+				"id": "textFrames-1",
+				"kind": "text",
+				"label": "Text Frame 02",
+				"text": "Instantly Query All FOIA Requests",
+				"fit": "contain",
+				"surface": "text",
+				"mediaType": "text",
+				"durationInMs": 1600,
+				"source": null
+			},
+			{
+				"id": "desktopScreenRecordings-0",
+				"kind": "video",
+				"label": "Instantly Find B7A Requests",
+				"text": null,
+				"fit": "contain",
+				"surface": "desktop",
+				"mediaType": "recording",
+				"durationInMs": 6000,
+				"source": {
+					"path": "/project-previews/foia-search/carousel/assets/desktop_recording_1.mp4",
+					"type": "video/mp4",
+					"width": 2810,
+					"height": 1774,
+					"aspectRatio": 1.583990980834273
+				}
+			},
+			{
+				"id": "textFrames-2",
+				"kind": "text",
+				"label": "Text Frame 03",
+				"text": "Recieve Email Alerts When New Requests Match Your Search",
+				"fit": "contain",
+				"surface": "text",
+				"mediaType": "text",
+				"durationInMs": 1600,
+				"source": null
+			},
+			{
+				"id": "mobileScreenRecordings-0",
+				"kind": "video",
+				"label": "Mobile Recording 01",
+				"text": null,
+				"fit": "contain",
+				"surface": "mobile",
+				"mediaType": "recording",
+				"durationInMs": 4200,
+				"source": {
+					"path": "/project-previews/foia-search/carousel/assets/mobile_recording_1.mp4",
+					"type": "video/mp4",
+					"width": 1204,
+					"height": 2464,
+					"aspectRatio": 0.48863636363636365
+				}
+			}
+		]
+	}
+}

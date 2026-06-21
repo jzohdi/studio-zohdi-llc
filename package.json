@@ -17,7 +17,8 @@
 		"video:dev": "npm --prefix remotion run dev",
 		"video:compositions": "npm --prefix remotion run compositions",
 		"video:render": "npm --prefix remotion run render --",
-		"video:publish": "node scripts/publish-project-preview.mjs"
+		"video:publish": "node scripts/publish-project-preview.mjs",
+		"carousel:publish": "node scripts/publish-project-preview-carousel.mjs"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

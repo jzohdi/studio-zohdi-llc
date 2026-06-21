@@ -6,10 +6,10 @@ Reusable Remotion compositions for project preview videos that can be rendered b
 
 - One `ProjectPreview-*` composition per project
 - One `PortfolioOverview` composition that chains the full lineup together
-- A manifest-driven asset system in `remotion/src/lib/assets.ts`
+- A manifest-driven asset system in `remotion/src/data/project-preview-manifest.json`
 - Any number of desktop screenshots, mobile screenshots, desktop recordings, mobile recordings, and text frames per project
 - Automatic scene sequencing with simple slide/fade transitions
-- Palette overrides and per-project timing defaults
+- Palette overrides, per-project timing defaults, and homepage mobile poster selection
 
 ## Commands
 
@@ -20,6 +20,7 @@ npm run video:dev
 npm run video:compositions
 npm run video:render -- PortfolioOverview out/portfolio-overview.mp4
 npm run video:render -- ProjectPreview-foia-search out/foia-search.mp4
+pnpm carousel:publish foia-search
 ```
 
 Inside `remotion/` directly:
@@ -49,7 +50,7 @@ remotion/public/projects/foia-search/desktop/video/search-demo.mp4
 
 ## Manifest configuration
 
-Edit `remotion/src/lib/assets.ts`.
+Edit `remotion/src/data/project-preview-manifest.json`.
 
 Example shape:
 
@@ -158,6 +159,85 @@ The best results usually come from mixing stills and short motion clips rather t
 - Prefer smooth cursor motion and restrained zoom
 - Export muted footage because Remotion renders these previews without audio
 - Record at high resolution so the framed crop still feels premium
+
+## Homepage carousel export
+
+To export homepage carousel assets from the same manifest without rendering a video:
+
+```bash
+pnpm carousel:publish foia-search
+```
+
+That flow:
+
+1. reads `remotion/src/data/project-preview-manifest.json`
+2. resolves the same ordered scenes used by the Remotion compositions
+3. copies the referenced screenshots and recordings into `static/project-previews/<project-id>/carousel/assets/`
+4. detects the copied media dimensions so the homepage mobile phone mock can size itself to each asset
+5. writes `src/lib/generated/project-preview-carousel.ts` for the Svelte homepage
+
+Desktop homepage previews read that generated scene manifest and render a native HTML carousel. Mobile previews use the separately configured `homepage.mobilePoster` image.
+
+Example:
+
+```json
+{
+	"foiaSearch": {
+		"projectId": "foia-search",
+		"homepage": {
+			"mobilePoster": {
+				"collection": "mobileScreenshots",
+				"index": 0
+			}
+		}
+	}
+}
+```
+
+### Editing Carousel Output
+
+When you want to change the homepage carousel for a project, use this workflow:
+
+1. Add or replace the source asset under `remotion/public/projects/<project-id>/`
+2. Update the matching entry in `remotion/src/data/project-preview-manifest.json`
+3. If the homepage slide order should change, update the project's `timeline`
+4. If the mobile homepage poster should change, update `homepage.mobilePoster`
+5. Run `pnpm carousel:publish <project-id>`
+
+Important notes:
+
+- `mobileScreenshots`, `mobileScreenRecordings`, `desktopScreenshots`, and `desktopScreenRecordings` are just named collections. The actual homepage order comes from `timeline` when it is present.
+- You do not need to hand-tune the mobile phone mock ratio per slide. `pnpm carousel:publish <project-id>` detects image and video dimensions and exports the aspect ratio automatically.
+- `src/lib/generated/project-preview-carousel.ts` is generated. Do not edit it by hand.
+- If you want the Remotion video composition to match the same change, also rerender or republish the video after updating the manifest.
+
+Example: replace the last FOIA homepage carousel slide with a new mobile recording:
+
+```json
+{
+	"mobileScreenRecordings": [
+		{
+			"path": "projects/foia-search/mobile_recording_1.mp4",
+			"durationInSeconds": 4.2,
+			"fit": "contain"
+		}
+	],
+	"timeline": [
+		{ "collection": "textFrames", "index": 0 },
+		{ "collection": "mobileScreenshots", "index": 0 },
+		{ "collection": "textFrames", "index": 1 },
+		{ "collection": "desktopScreenRecordings", "index": 0 },
+		{ "collection": "textFrames", "index": 2 },
+		{ "collection": "mobileScreenRecordings", "index": 0 }
+	]
+}
+```
+
+Then run:
+
+```bash
+pnpm carousel:publish foia-search
+```
 
 ## Rendering back into the site
 

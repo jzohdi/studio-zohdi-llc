@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ProjectDesktopPreview from '$lib/components/home/ProjectDesktopPreview.svelte';
-	import ProjectPreviewCard from '$lib/components/home/ProjectPreviewCard.svelte';
+	import ProjectMobilePreview from '$lib/components/home/ProjectMobilePreview.svelte';
 	import ThemeToggle from '$lib/components/home/ThemeToggle.svelte';
 	import { defaultFeaturedProjectId, featuredProjects } from '$lib/data/featured-projects';
 	import {
@@ -171,7 +171,7 @@
 								</div>
 
 								<div class="project-row__visual">
-									<ProjectPreviewCard {project} size="mobile" />
+									<ProjectMobilePreview {project} />
 								</div>
 							</article>
 						</li>
