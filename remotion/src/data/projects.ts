@@ -76,3 +76,17 @@ export const defaultMotionProjectId = motionProjects[0]?.id ?? 'foia-search';
 export const getMotionProject = (projectId: string): MotionProject => {
 	return motionProjects.find((project) => project.id === projectId) ?? motionProjects[0]!;
 };
+
+export const mergeMotionPalette = (
+	basePalette: MotionPalette,
+	overrides?: Partial<MotionPalette>
+): MotionPalette => {
+	if (!overrides) {
+		return basePalette;
+	}
+
+	return {
+		...basePalette,
+		...overrides
+	};
+};

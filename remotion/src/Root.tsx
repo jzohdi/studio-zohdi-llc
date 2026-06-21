@@ -1,13 +1,10 @@
 import React from 'react';
 import {Composition} from 'remotion';
 import {motionProjects} from './data/projects';
-import {
-	PortfolioOverview,
-	portfolioOverviewDurationInFrames
-} from './compositions/PortfolioOverview';
+import {PortfolioOverview, portfolioOverviewDurationInFrames} from './compositions/PortfolioOverview';
 import {ProjectPreview, type ProjectPreviewProps} from './compositions/ProjectPreview';
+import {getProjectTimeline} from './lib/assets';
 
-const projectPreviewDurationInFrames = 240;
 const fps = 30;
 const width = 1920;
 const height = 1080;
@@ -18,7 +15,7 @@ export const RemotionRoot: React.FC = () => {
 			<Composition
 				id="PortfolioOverview"
 				component={PortfolioOverview}
-				durationInFrames={portfolioOverviewDurationInFrames}
+				durationInFrames={portfolioOverviewDurationInFrames(fps)}
 				fps={fps}
 				width={width}
 				height={height}
@@ -28,7 +25,7 @@ export const RemotionRoot: React.FC = () => {
 					key={project.id}
 					id={`ProjectPreview-${project.id}`}
 					component={ProjectPreview}
-					durationInFrames={projectPreviewDurationInFrames}
+					durationInFrames={getProjectTimeline(project.id, fps).totalDurationInFrames}
 					fps={fps}
 					width={width}
 					height={height}

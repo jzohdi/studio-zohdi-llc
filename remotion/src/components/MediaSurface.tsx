@@ -1,11 +1,11 @@
 import React from 'react';
 import {AbsoluteFill, Img, OffthreadVideo} from 'remotion';
 import type {MotionPalette} from '../data/projects';
-import type {ProjectAsset} from '../lib/assets';
+import type {ResolvedProjectScene} from '../lib/assets';
 import {PlaceholderSurface} from './PlaceholderSurface';
 
 type MediaSurfaceProps = {
-	asset: ProjectAsset | null;
+	asset: ResolvedProjectScene | null;
 	fit?: 'cover' | 'contain';
 	label: string;
 	palette: MotionPalette;
@@ -21,7 +21,7 @@ export const MediaSurface: React.FC<MediaSurfaceProps> = ({
 	projectName,
 	variant
 }) => {
-	if (!asset) {
+	if (!asset || !asset.src) {
 		return (
 			<PlaceholderSurface
 				label={label}
@@ -41,9 +41,15 @@ export const MediaSurface: React.FC<MediaSurfaceProps> = ({
 	return (
 		<AbsoluteFill>
 			{asset.kind === 'video' ? (
-				<OffthreadVideo src={asset.src} style={commonStyle} volume={0} />
+				<OffthreadVideo
+					src={asset.src ?? ''}
+					style={commonStyle}
+					volume={0}
+					trimBefore={asset.trimBeforeInFrames}
+					trimAfter={asset.trimAfterInFrames}
+				/>
 			) : (
-				<Img src={asset.src} style={commonStyle} />
+				<Img src={asset.src ?? ''} style={commonStyle} />
 			)}
 		</AbsoluteFill>
 	);

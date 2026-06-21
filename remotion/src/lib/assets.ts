@@ -1,127 +1,430 @@
-import {getStaticFiles, type StaticFile} from 'remotion';
+import { staticFile } from 'remotion';
+import {
+	getMotionProject,
+	mergeMotionPalette,
+	motionProjects,
+	type MotionPalette,
+	type MotionProject
+} from '../data/projects';
 
 export type AssetKind = 'image' | 'video';
-export type AssetSlot = 'desktop' | 'mobile' | 'detail' | 'flow';
+export type MediaFit = 'cover' | 'contain';
+export type SceneSurface = 'desktop' | 'mobile';
+export type SceneMediaType = 'screenshot' | 'recording';
+export type AssetCollectionName =
+	| 'desktopScreenshots'
+	| 'desktopScreenRecordings'
+	| 'mobileScreenshots'
+	| 'mobileScreenRecordings';
 
-export type ProjectAsset = {
+type AssetStringInput = string;
+
+type AssetObjectInput = {
+	path: string;
+	durationInSeconds?: number;
+	trimBeforeInSeconds?: number;
+	fit?: MediaFit;
+	label?: string;
+};
+
+export type ScreenshotAssetInput = AssetStringInput | AssetObjectInput;
+export type RecordingAssetInput = AssetStringInput | AssetObjectInput;
+
+type TimelineReference = {
+	collection: AssetCollectionName;
+	index: number;
+};
+
+type ProjectAssetDefaults = {
+	screenshotDurationInSeconds?: number;
+	recordingDurationInSeconds?: number;
+	transitionDurationInSeconds?: number;
+};
+
+type ResolvedProjectAssetDefaults = {
+	screenshotDurationInSeconds: number;
+	recordingDurationInSeconds: number;
+	transitionDurationInSeconds: number;
+};
+
+export type ProjectAssetConfig = {
+	projectId: string;
+	palette?: Partial<MotionPalette>;
+	defaults?: ProjectAssetDefaults;
+	desktopScreenshots?: ScreenshotAssetInput[];
+	desktopScreenRecordings?: RecordingAssetInput[];
+	mobileScreenshots?: ScreenshotAssetInput[];
+	mobileScreenRecordings?: RecordingAssetInput[];
+	timeline?: TimelineReference[];
+};
+
+export type ResolvedProjectScene = {
+	id: string;
 	kind: AssetKind;
-	name: string;
-	src: string;
-	slot: AssetSlot;
+	src: string | null;
+	path: string | null;
+	label: string;
+	surface: SceneSurface;
+	mediaType: SceneMediaType;
+	fit: MediaFit;
+	durationInFrames: number;
+	trimBeforeInFrames: number;
+	trimAfterInFrames?: number;
+	collection: AssetCollectionName;
+	collectionIndex: number;
 };
 
-export type ProjectAssets = Record<AssetSlot, ProjectAsset | null>;
-
-const imageExtensions = new Set(['png', 'jpg', 'jpeg', 'webp', 'svg']);
-const videoExtensions = new Set(['mp4', 'mov', 'webm', 'm4v']);
-
-const assetNameAliases: Record<AssetSlot, string[]> = {
-	desktop: ['desktop', 'browser', 'hero-desktop', 'main'],
-	mobile: ['mobile', 'phone', 'hero-mobile', 'app'],
-	detail: ['detail', 'supporting', 'crop', 'secondary'],
-	flow: ['flow', 'footage', 'demo', 'screenstudio', 'screen-studio']
+export type ProjectTimeline = {
+	project: MotionProject;
+	palette: MotionPalette;
+	scenes: ResolvedProjectScene[];
+	transitionDurationInFrames: number;
+	totalDurationInFrames: number;
+	anyRealAsset: boolean;
 };
 
-const emptyAssets: ProjectAssets = {
-	desktop: null,
-	mobile: null,
-	detail: null,
-	flow: null
+const defaultTimings = {
+	screenshotDurationInSeconds: 1.8,
+	recordingDurationInSeconds: 3.2,
+	transitionDurationInSeconds: 0.6
+} as const;
+
+const collectionOrder: AssetCollectionName[] = [
+	'desktopScreenshots',
+	'mobileScreenshots',
+	'desktopScreenRecordings',
+	'mobileScreenRecordings'
+];
+
+const sceneLabels: Record<AssetCollectionName, string> = {
+	desktopScreenshots: 'Desktop Screenshot',
+	desktopScreenRecordings: 'Desktop Recording',
+	mobileScreenshots: 'Mobile Screenshot',
+	mobileScreenRecordings: 'Mobile Recording'
 };
 
-const normalizePath = (value: string): string => value.replace(/\\/g, '/').toLowerCase();
+const normalizeAssetPath = (value: string): string => {
+	const normalized = value.replace(/\\/g, '/').trim().replace(/^\.?\//, '');
 
-const getExtension = (value: string): string => {
-	const normalized = normalizePath(value);
-	const lastDot = normalized.lastIndexOf('.');
-
-	return lastDot === -1 ? '' : normalized.slice(lastDot + 1);
+	return normalized.startsWith('http://') || normalized.startsWith('https://')
+		? normalized
+		: normalized.replace(/^\/+/, '');
 };
 
-const getBaseName = (value: string): string => {
-	const normalized = normalizePath(value);
-	const lastSlash = normalized.lastIndexOf('/');
-	const filename = lastSlash === -1 ? normalized : normalized.slice(lastSlash + 1);
-	const extension = getExtension(filename);
+const resolveAssetSrc = (value: string): string => {
+	const normalized = normalizeAssetPath(value);
 
-	return extension ? filename.slice(0, -(extension.length + 1)) : filename;
+	return normalized.startsWith('http://') || normalized.startsWith('https://')
+		? normalized
+		: staticFile(normalized);
 };
 
-const getAssetKind = (file: StaticFile): AssetKind | null => {
-	const extension = getExtension(file.name);
+const toFrames = (seconds: number, fps: number): number => {
+	return Math.max(1, Math.round(seconds * fps));
+};
 
-	if (imageExtensions.has(extension)) {
-		return 'image';
+const resolveDurationInFrames = (
+	input: AssetObjectInput | undefined,
+	fallbackDurationInSeconds: number,
+	fps: number
+): number => {
+	return toFrames(input?.durationInSeconds ?? fallbackDurationInSeconds, fps);
+};
+
+const resolveTrimBeforeInFrames = (input: AssetObjectInput | undefined, fps: number): number => {
+	return input?.trimBeforeInSeconds ? toFrames(input.trimBeforeInSeconds, fps) : 0;
+};
+
+const toAssetObject = (input: ScreenshotAssetInput | RecordingAssetInput): AssetObjectInput => {
+	if (typeof input === 'string') {
+		return { path: input };
 	}
 
-	if (videoExtensions.has(extension)) {
-		return 'video';
+	return input;
+};
+
+const getCollectionSurface = (collection: AssetCollectionName): SceneSurface => {
+	return collection.startsWith('desktop') ? 'desktop' : 'mobile';
+};
+
+const getCollectionMediaType = (collection: AssetCollectionName): SceneMediaType => {
+	return collection.includes('Recordings') ? 'recording' : 'screenshot';
+};
+
+const createSceneLabel = (
+	collection: AssetCollectionName,
+	index: number,
+	customLabel?: string
+): string => {
+	return customLabel ?? `${sceneLabels[collection]} ${String(index + 1).padStart(2, '0')}`;
+};
+
+const buildResolvedScene = (
+	collection: AssetCollectionName,
+	index: number,
+	input: ScreenshotAssetInput | RecordingAssetInput,
+	fps: number,
+	defaults: ResolvedProjectAssetDefaults
+): ResolvedProjectScene => {
+	const assetObject = toAssetObject(input);
+	const mediaType = getCollectionMediaType(collection);
+	const durationInFrames = resolveDurationInFrames(
+		assetObject,
+		mediaType === 'recording'
+			? defaults.recordingDurationInSeconds
+			: defaults.screenshotDurationInSeconds,
+		fps
+	);
+	const trimBeforeInFrames = resolveTrimBeforeInFrames(assetObject, fps);
+	const path = normalizeAssetPath(assetObject.path);
+
+	return {
+		id: `${collection}-${index}`,
+		kind: mediaType === 'recording' ? 'video' : 'image',
+		src: resolveAssetSrc(path),
+		path,
+		label: createSceneLabel(collection, index, assetObject.label),
+		surface: getCollectionSurface(collection),
+		mediaType,
+		fit: assetObject.fit ?? 'cover',
+		durationInFrames,
+		trimBeforeInFrames,
+		trimAfterInFrames:
+			mediaType === 'recording' ? trimBeforeInFrames + durationInFrames : undefined,
+		collection,
+		collectionIndex: index
+	};
+};
+
+const buildAutoTimeline = (
+	collections: Record<AssetCollectionName, ResolvedProjectScene[]>
+): TimelineReference[] => {
+	const references: TimelineReference[] = [];
+	const maxLength = Math.max(...collectionOrder.map((collection) => collections[collection].length), 0);
+
+	for (let index = 0; index < maxLength; index += 1) {
+		for (const collection of collectionOrder) {
+			if (collections[collection][index]) {
+				references.push({ collection, index });
+			}
+		}
 	}
 
-	return null;
+	return references;
 };
 
-const getAssetScore = (file: StaticFile, slot: AssetSlot): number => {
-	const aliases = assetNameAliases[slot];
-	const baseName = getBaseName(file.name);
-	const exactAliasIndex = aliases.findIndex((alias) => alias === baseName);
-	const extension = getExtension(file.name);
-	const kind = getAssetKind(file);
+const fallbackScenes = (fps: number): ResolvedProjectScene[] => [
+	{
+		id: 'placeholder-desktop',
+		kind: 'image',
+		src: null,
+		path: null,
+		label: 'Desktop Screenshot 01',
+		surface: 'desktop',
+		mediaType: 'screenshot',
+		fit: 'cover',
+		durationInFrames: toFrames(defaultTimings.screenshotDurationInSeconds, fps),
+		trimBeforeInFrames: 0,
+		collection: 'desktopScreenshots',
+		collectionIndex: 0
+	},
+	{
+		id: 'placeholder-mobile',
+		kind: 'image',
+		src: null,
+		path: null,
+		label: 'Mobile Screenshot 01',
+		surface: 'mobile',
+		mediaType: 'screenshot',
+		fit: 'cover',
+		durationInFrames: toFrames(defaultTimings.screenshotDurationInSeconds, fps),
+		trimBeforeInFrames: 0,
+		collection: 'mobileScreenshots',
+		collectionIndex: 0
+	}
+];
 
-	const aliasScore = exactAliasIndex === -1 ? aliases.length + 1 : exactAliasIndex;
-	const extensionScore = kind === 'video' ? 0 : extension === 'png' ? 1 : extension === 'webp' ? 2 : 3;
-
-	return aliasScore * 10 + extensionScore;
+const getProjectAssetConfig = (projectId: string): ProjectAssetConfig | null => {
+	return (
+		Object.values(projectAssetManifest).find((entry) => {
+			return entry.projectId === projectId;
+		}) ?? null
+	);
 };
 
-const fileMatchesSlot = (file: StaticFile, slot: AssetSlot): boolean => {
-	const aliases = assetNameAliases[slot];
-	const baseName = getBaseName(file.name);
+const getTransitionDurationInFrames = (config: ProjectAssetConfig | null, fps: number): number => {
+	return toFrames(
+		config?.defaults?.transitionDurationInSeconds ?? defaultTimings.transitionDurationInSeconds,
+		fps
+	);
+};
 
-	return aliases.some((alias) => {
-		return baseName === alias || baseName.startsWith(`${alias}-`) || baseName.startsWith(`${alias}_`);
+export const projectAssetManifest = {
+	foiaSearch: {
+		projectId: 'foia-search',
+		palette: {
+			backgroundStart: '#edf8f7',
+			backgroundEnd: '#d7ebe6',
+			glow: 'rgba(17, 140, 122, 0.24)',
+			highlight: '#118c7a',
+			surface: 'rgba(244, 251, 249, 0.84)',
+			border: 'rgba(17, 97, 93, 0.18)',
+			label: '#124c4a'
+		},
+		defaults: {
+			screenshotDurationInSeconds: 1.9,
+			transitionDurationInSeconds: 0.7
+		},
+		desktopScreenshots: [
+			{
+				path: 'projects/foia-search/desktop_1.png',
+				durationInSeconds: 1.95,
+				fit: 'contain',
+				label: 'Homepage Overview'
+			},
+			{
+				path: 'projects/foia-search/desktop_2.png',
+				durationInSeconds: 2.15,
+				fit: 'contain',
+				label: 'Search Results Detail'
+			}
+		],
+		desktopScreenRecordings: [],
+		mobileScreenshots: [
+			{
+				path: 'projects/foia-search/mobile_1.png',
+				durationInSeconds: 1.85,
+				fit: 'contain',
+				label: 'Mobile Results View'
+			},
+			{
+				path: 'projects/foia-search/mobile_2.png',
+				durationInSeconds: 2.15,
+				fit: 'contain',
+				label: 'Email Alerts Based on Search Results'
+			}
+		],
+		mobileScreenRecordings: [],
+		timeline: [
+			{ collection: 'desktopScreenshots', index: 0 },
+			{ collection: 'mobileScreenshots', index: 0 },
+			{ collection: 'desktopScreenshots', index: 1 },
+			{ collection: 'mobileScreenshots', index: 1 }
+		]
+	},
+	stockPromotionTracker: {
+		projectId: 'stock-promotion-tracker',
+		desktopScreenshots: [],
+		desktopScreenRecordings: [],
+		mobileScreenshots: [],
+		mobileScreenRecordings: []
+	},
+	stopNasdaqChinaFraud: {
+		projectId: 'stop-nasdaq-china-fraud',
+		desktopScreenshots: [],
+		desktopScreenRecordings: [],
+		mobileScreenshots: [],
+		mobileScreenRecordings: []
+	},
+	highGroundResearch: {
+		projectId: 'highgroundresearch',
+		desktopScreenshots: [],
+		desktopScreenRecordings: [],
+		mobileScreenshots: [],
+		mobileScreenRecordings: []
+	},
+	greffier: {
+		projectId: 'greffier',
+		desktopScreenshots: [],
+		desktopScreenRecordings: [],
+		mobileScreenshots: [],
+		mobileScreenRecordings: []
+	},
+	search8k: {
+		projectId: '8ksearch',
+		desktopScreenshots: [],
+		desktopScreenRecordings: [],
+		mobileScreenshots: [],
+		mobileScreenRecordings: []
+	}
+} satisfies Record<string, ProjectAssetConfig>;
+
+export const getProjectTimeline = (projectId: string, fps: number): ProjectTimeline => {
+	const project = getMotionProject(projectId);
+	const config = getProjectAssetConfig(projectId);
+	const timings = {
+		screenshotDurationInSeconds:
+			config?.defaults?.screenshotDurationInSeconds ?? defaultTimings.screenshotDurationInSeconds,
+		recordingDurationInSeconds:
+			config?.defaults?.recordingDurationInSeconds ?? defaultTimings.recordingDurationInSeconds,
+		transitionDurationInSeconds:
+			config?.defaults?.transitionDurationInSeconds ?? defaultTimings.transitionDurationInSeconds
+	};
+
+	const collections: Record<AssetCollectionName, ResolvedProjectScene[]> = {
+		desktopScreenshots: (config?.desktopScreenshots ?? []).map((asset, index) =>
+			buildResolvedScene('desktopScreenshots', index, asset, fps, timings)
+		),
+		desktopScreenRecordings: (config?.desktopScreenRecordings ?? []).map((asset, index) =>
+			buildResolvedScene('desktopScreenRecordings', index, asset, fps, timings)
+		),
+		mobileScreenshots: (config?.mobileScreenshots ?? []).map((asset, index) =>
+			buildResolvedScene('mobileScreenshots', index, asset, fps, timings)
+		),
+		mobileScreenRecordings: (config?.mobileScreenRecordings ?? []).map((asset, index) =>
+			buildResolvedScene('mobileScreenRecordings', index, asset, fps, timings)
+		)
+	};
+
+	const timelineReferences = config?.timeline?.length ? config.timeline : buildAutoTimeline(collections);
+	const scenes = timelineReferences
+		.map((reference) => collections[reference.collection][reference.index] ?? null)
+		.filter((scene): scene is ResolvedProjectScene => Boolean(scene));
+	const normalizedScenes = scenes.length > 0 ? scenes : fallbackScenes(fps);
+	const maxTransitionDurationInFrames =
+		normalizedScenes.length > 1
+			? Math.max(
+				0,
+				Math.min(...normalizedScenes.map((scene) => Math.max(1, scene.durationInFrames - 1)))
+			)
+			: 0;
+	const transitionDurationInFrames = Math.min(
+		getTransitionDurationInFrames(config, fps),
+		maxTransitionDurationInFrames
+	);
+	const totalDurationInFrames = normalizedScenes.reduce((total, scene, index) => {
+		const overlap = index === 0 ? 0 : transitionDurationInFrames;
+
+		return total + scene.durationInFrames - overlap;
+	}, 0);
+
+	return {
+		project,
+		palette: mergeMotionPalette(project.palette, config?.palette),
+		scenes: normalizedScenes,
+		transitionDurationInFrames,
+		totalDurationInFrames,
+		anyRealAsset: scenes.length > 0
+	};
+};
+
+export const getProjectSceneStartFrames = (
+	scenes: ResolvedProjectScene[],
+	transitionDurationInFrames: number
+): number[] => {
+	let cursor = 0;
+
+	return scenes.map((scene, index) => {
+		const start = cursor;
+		const overlap = index === scenes.length - 1 ? 0 : transitionDurationInFrames;
+		cursor += scene.durationInFrames - overlap;
+
+		return start;
 	});
 };
 
-const pickProjectAsset = (files: StaticFile[], projectId: string, slot: AssetSlot): ProjectAsset | null => {
-	const projectPrefix = `projects/${projectId}/`;
-
-	const candidates = files
-		.filter((file) => normalizePath(file.name).startsWith(projectPrefix))
-		.filter((file) => getAssetKind(file) !== null)
-		.filter((file) => fileMatchesSlot(file, slot))
-		.sort((left, right) => getAssetScore(left, slot) - getAssetScore(right, slot));
-
-	const file = candidates[0];
-	const kind = file ? getAssetKind(file) : null;
-
-	if (!file || !kind) {
-		return null;
-	}
-
-	return {
-		kind,
-		name: file.name,
-		src: file.src,
-		slot
-	};
-};
-
-export const resolveProjectAssets = (projectId: string): ProjectAssets => {
-	const files = getStaticFiles();
-
-	if (files.length === 0) {
-		return emptyAssets;
-	}
-
-	return {
-		desktop: pickProjectAsset(files, projectId, 'desktop'),
-		mobile: pickProjectAsset(files, projectId, 'mobile'),
-		detail: pickProjectAsset(files, projectId, 'detail'),
-		flow: pickProjectAsset(files, projectId, 'flow')
-	};
-};
-
-export const hasAnyProjectAsset = (assets: ProjectAssets): boolean => {
-	return Object.values(assets).some(Boolean);
+export const getPortfolioOverviewDurationInFrames = (fps: number): number => {
+	return motionProjects.reduce((total, project) => {
+		return total + getProjectTimeline(project.id, fps).totalDurationInFrames;
+	}, 0);
 };

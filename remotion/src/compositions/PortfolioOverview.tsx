@@ -1,20 +1,36 @@
-import React from 'react';
-import {AbsoluteFill, Sequence, interpolate, useCurrentFrame} from 'remotion';
-import {motionProjects, type MotionProject} from '../data/projects';
+import React, {useMemo} from 'react';
+import {AbsoluteFill, Sequence, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
+import {motionProjects} from '../data/projects';
 import {bodyFontFamily, displayFontFamily} from '../lib/fonts';
+import {getProjectTimeline, getPortfolioOverviewDurationInFrames} from '../lib/assets';
 import {ProjectPreview} from './ProjectPreview';
 
-export const portfolioOverviewSegmentLength = 90;
-export const portfolioOverviewDurationInFrames =
-	motionProjects.length * portfolioOverviewSegmentLength;
+type OverviewTitleCardProps = {
+	durationInFrames: number;
+	label: string;
+	nameLines: string[];
+	paletteBorder: string;
+	paletteLabel: string;
+	summary: string;
+	website?: string;
+};
 
-const OverviewTitleCard: React.FC<{project: MotionProject}> = ({project}) => {
+const OverviewTitleCard: React.FC<OverviewTitleCardProps> = ({
+	durationInFrames,
+	label,
+	nameLines,
+	paletteBorder,
+	paletteLabel,
+	summary,
+	website
+}) => {
 	const frame = useCurrentFrame();
-	const opacity = interpolate(frame, [0, 14, 68, 88], [0, 1, 1, 0], {
+	const outroStart = Math.max(26, durationInFrames - 26);
+	const opacity = interpolate(frame, [0, 14, outroStart, durationInFrames], [0, 1, 1, 0], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp'
 	});
-	const translateY = interpolate(frame, [0, 18, 90], [36, 0, -18], {
+	const translateY = interpolate(frame, [0, 18, durationInFrames], [36, 0, -18], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp'
 	});
@@ -37,7 +53,7 @@ const OverviewTitleCard: React.FC<{project: MotionProject}> = ({project}) => {
 			<div
 				style={{
 					maxWidth: 820,
-					color: project.palette.label
+					color: paletteLabel
 				}}
 			>
 				<div
@@ -50,7 +66,7 @@ const OverviewTitleCard: React.FC<{project: MotionProject}> = ({project}) => {
 						textTransform: 'uppercase'
 					}}
 				>
-					{project.nameLines.map((line) => (
+					{nameLines.map((line) => (
 						<div key={line}>{line}</div>
 					))}
 				</div>
@@ -63,7 +79,7 @@ const OverviewTitleCard: React.FC<{project: MotionProject}> = ({project}) => {
 						color: 'rgba(18, 24, 38, 0.72)'
 					}}
 				>
-					{project.summary}
+					{summary}
 				</div>
 			</div>
 			<div
@@ -71,21 +87,28 @@ const OverviewTitleCard: React.FC<{project: MotionProject}> = ({project}) => {
 					padding: '16px 20px',
 					borderRadius: 24,
 					background: 'rgba(255,255,255,0.6)',
-					boxShadow: `0 22px 70px rgba(16, 20, 38, 0.12), inset 0 0 0 1px ${project.palette.border}`,
+					boxShadow: `0 22px 70px rgba(16, 20, 38, 0.12), inset 0 0 0 1px ${paletteBorder}`,
 					backdropFilter: 'blur(22px)',
 					fontFamily: bodyFontFamily,
 					fontSize: 18,
 					fontWeight: 600,
-					color: project.palette.label
+					color: paletteLabel
 				}}
 			>
-				{project.website?.replace(/^https?:\/\//, '') ?? 'Desktop app preview'}
+				{website?.replace(/^https?:\/\//, '') ?? label}
 			</div>
 		</div>
 	);
 };
 
 export const PortfolioOverview: React.FC = () => {
+	const {fps} = useVideoConfig();
+	const projectTimelines = useMemo(() => {
+		return motionProjects.map((project) => getProjectTimeline(project.id, fps));
+	}, [fps]);
+
+	let cursor = 0;
+
 	return (
 		<AbsoluteFill style={{background: '#f8f5f1'}}>
 			<div
@@ -110,16 +133,33 @@ export const PortfolioOverview: React.FC = () => {
 				Studio Zohdi / Portfolio Overview
 			</div>
 
-			{motionProjects.map((project, index) => (
-				<Sequence
-					key={project.id}
-					from={index * portfolioOverviewSegmentLength}
-					durationInFrames={portfolioOverviewSegmentLength}
-				>
-					<ProjectPreview projectId={project.id} showLockup={false} />
-					<OverviewTitleCard project={project} />
-				</Sequence>
-			))}
+			{projectTimelines.map((timeline) => {
+				const from = cursor;
+				cursor += timeline.totalDurationInFrames;
+
+				return (
+					<Sequence
+						key={timeline.project.id}
+						from={from}
+						durationInFrames={timeline.totalDurationInFrames}
+					>
+						<ProjectPreview projectId={timeline.project.id} showLockup={false} />
+						<OverviewTitleCard
+							durationInFrames={timeline.totalDurationInFrames}
+							label="Desktop app preview"
+							nameLines={timeline.project.nameLines}
+							paletteBorder={timeline.palette.border}
+							paletteLabel={timeline.palette.label}
+							summary={timeline.project.summary}
+							website={timeline.project.website}
+						/>
+					</Sequence>
+				);
+			})}
 		</AbsoluteFill>
 	);
+};
+
+export const portfolioOverviewDurationInFrames = (fps: number): number => {
+	return getPortfolioOverviewDurationInFrames(fps);
 };

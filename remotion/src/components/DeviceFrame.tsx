@@ -13,8 +13,8 @@ type PhoneFrameProps = {
 };
 
 const screenStyle: CSSProperties = {
-	width: '100%',
-	height: '100%',
+	flex: 1,
+	minHeight: 0,
 	borderRadius: 24,
 	overflow: 'hidden',
 	background: 'rgba(255,255,255,0.96)'
@@ -25,10 +25,15 @@ export const BrowserFrame: React.FC<BrowserFrameProps> = ({children, style, url}
 		<div
 			style={{
 				position: 'absolute',
+				display: 'flex',
+				flexDirection: 'column',
+				boxSizing: 'border-box',
 				borderRadius: 34,
 				padding: 14,
-				background: 'rgba(13, 15, 26, 0.88)',
-				boxShadow: '0 36px 110px rgba(15, 20, 45, 0.22)',
+				border: '1px solid rgba(245, 251, 249, 0.44)',
+				background: 'rgba(13, 15, 26, 0.9)',
+				boxShadow:
+					'0 36px 110px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(255,255,255,0.05)',
 				backdropFilter: 'blur(18px)',
 				...style
 			}}
@@ -51,8 +56,8 @@ export const BrowserFrame: React.FC<BrowserFrameProps> = ({children, style, url}
 						marginLeft: 12,
 						padding: '8px 14px',
 						borderRadius: 999,
-						background: 'rgba(255,255,255,0.1)',
-						color: 'rgba(255,255,255,0.62)',
+						background: 'rgba(255,255,255,0.12)',
+						color: 'rgba(255,255,255,0.72)',
 						fontSize: 13,
 						fontWeight: 500,
 						letterSpacing: '0.02em'
@@ -71,11 +76,16 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({children, style}) => {
 		<div
 			style={{
 				position: 'absolute',
+				display: 'flex',
+				flexDirection: 'column',
+				boxSizing: 'border-box',
 				borderRadius: 42,
 				padding: 10,
+				border: '1px solid rgba(245, 251, 249, 0.22)',
 				background:
 					'linear-gradient(180deg, rgba(20, 23, 34, 0.94), rgba(7, 10, 18, 0.98) 100%)',
-				boxShadow: '0 30px 90px rgba(9, 12, 26, 0.26)',
+				boxShadow:
+					'0 30px 90px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255,255,255,0.04)',
 				...style
 			}}
 		>

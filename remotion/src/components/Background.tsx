@@ -6,25 +6,40 @@ type BackgroundProps = {
 	palette: MotionPalette;
 };
 
+const grainSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+  <filter id="noise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="220" height="220" filter="url(#noise)" opacity="1"/>
+</svg>
+`;
+
+const grainTexture = `url("data:image/svg+xml,${encodeURIComponent(grainSvg)}")`;
+
 export const Background: React.FC<BackgroundProps> = ({palette}) => {
 	const frame = useCurrentFrame();
 	const {durationInFrames} = useVideoConfig();
 	const phase = (frame / durationInFrames) * Math.PI * 2;
-	const driftX = Math.sin(phase) * 3.4;
-	const driftY = Math.cos(phase * 0.8) * 3.8;
-	const glowOpacity = interpolate(Math.sin(phase * 0.9), [-1, 1], [0.5, 0.85]);
+	const driftX = Math.sin(phase * 0.7) * 5.2;
+	const driftY = Math.cos(phase * 0.55) * 5.8;
+	const glowOpacity = interpolate(Math.sin(phase * 0.9), [-1, 1], [0.16, 0.28]);
+	const flowX = Math.sin(phase * 0.42) * 12;
+	const flowY = Math.cos(phase * 0.36) * 10;
 
 	return (
 		<AbsoluteFill
 			style={{
-				background: `linear-gradient(140deg, ${palette.backgroundStart} 0%, ${palette.backgroundEnd} 100%)`,
+				background:
+					'linear-gradient(145deg, rgb(6 14 14) 0%, rgb(10 26 24) 38%, rgb(5 14 14) 100%)',
 				overflow: 'hidden'
 			}}
 		>
 			<AbsoluteFill
 				style={{
-					background: `radial-gradient(circle at 18% 20%, ${palette.glow}, transparent 42%)`,
-					filter: 'blur(8px)',
+					background: `radial-gradient(circle at 18% 20%, ${palette.highlight}, transparent 40%)`,
+					filter: 'blur(14px)',
 					opacity: glowOpacity,
 					transform: `translate(${driftX}%, ${driftY}%) scale(1.08)`
 				}}
@@ -32,26 +47,44 @@ export const Background: React.FC<BackgroundProps> = ({palette}) => {
 			<AbsoluteFill
 				style={{
 					background:
-						'radial-gradient(circle at 78% 16%, rgba(255,255,255,0.32), transparent 28%), radial-gradient(circle at 70% 68%, rgba(255,255,255,0.18), transparent 30%)',
-					opacity: 0.9,
+						`radial-gradient(circle at 78% 16%, ${palette.backgroundStart}, transparent 28%), radial-gradient(circle at 70% 68%, ${palette.backgroundEnd}, transparent 34%)`,
+					opacity: 0.08,
+					filter: 'blur(22px)',
 					transform: `translate(${-driftX * 0.7}%, ${-driftY * 0.5}%) scale(1.02)`
 				}}
 			/>
 			<AbsoluteFill
 				style={{
-					backgroundImage:
-						'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
-					backgroundPosition: `${frame * -0.18}px ${frame * -0.12}px, ${frame * -0.22}px ${frame * -0.16}px`,
-					backgroundSize: '160px 160px',
-					maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.85))',
+					background:
+						'linear-gradient(120deg, transparent 16%, rgba(255,255,255,0.09) 48%, transparent 76%)',
+					filter: 'blur(56px)',
+					mixBlendMode: 'screen',
+					opacity: 0.24,
+					transform: `translate(${flowX}%, ${flowY}%) rotate(-8deg) scale(1.34)`
+				}}
+			/>
+			<AbsoluteFill
+				style={{
+					backgroundImage: grainTexture,
+					backgroundPosition: `${frame * -0.9}px ${frame * -0.45}px`,
+					backgroundSize: '220px 220px',
 					mixBlendMode: 'soft-light',
-					opacity: 0.44
+					opacity: 0.18
+				}}
+			/>
+			<AbsoluteFill
+				style={{
+					backgroundImage: grainTexture,
+					backgroundPosition: `${frame * 0.28}px ${frame * -0.18}px`,
+					backgroundSize: '130px 130px',
+					mixBlendMode: 'overlay',
+					opacity: 0.08
 				}}
 			/>
 			<AbsoluteFill
 				style={{
 					background:
-						'linear-gradient(180deg, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.04) 24%, rgba(0,0,0,0.08) 100%)'
+						'radial-gradient(circle at center, transparent 42%, rgba(0,0,0,0.36) 100%), linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 22%, rgba(0,0,0,0.16) 100%)'
 				}}
 			/>
 		</AbsoluteFill>
