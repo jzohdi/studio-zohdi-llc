@@ -16,7 +16,8 @@
 		"test": "npm run test:unit -- --run",
 		"video:dev": "npm --prefix remotion run dev",
 		"video:compositions": "npm --prefix remotion run compositions",
-		"video:render": "npm --prefix remotion run render --"
+		"video:render": "npm --prefix remotion run render --",
+		"video:publish": "node scripts/publish-project-preview.mjs"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

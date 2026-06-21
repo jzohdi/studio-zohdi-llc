@@ -7,15 +7,16 @@ import {
 	type MotionProject
 } from '../data/projects';
 
-export type AssetKind = 'image' | 'video';
+export type AssetKind = 'image' | 'video' | 'text';
 export type MediaFit = 'cover' | 'contain';
-export type SceneSurface = 'desktop' | 'mobile';
-export type SceneMediaType = 'screenshot' | 'recording';
+export type SceneSurface = 'desktop' | 'mobile' | 'text';
+export type SceneMediaType = 'screenshot' | 'recording' | 'text';
 export type AssetCollectionName =
 	| 'desktopScreenshots'
 	| 'desktopScreenRecordings'
 	| 'mobileScreenshots'
-	| 'mobileScreenRecordings';
+	| 'mobileScreenRecordings'
+	| 'textFrames';
 
 type AssetStringInput = string;
 
@@ -29,6 +30,10 @@ type AssetObjectInput = {
 
 export type ScreenshotAssetInput = AssetStringInput | AssetObjectInput;
 export type RecordingAssetInput = AssetStringInput | AssetObjectInput;
+export type TextFrameInput = {
+	text: string;
+	duration: number;
+};
 
 type TimelineReference = {
 	collection: AssetCollectionName;
@@ -55,6 +60,8 @@ export type ProjectAssetConfig = {
 	desktopScreenRecordings?: RecordingAssetInput[];
 	mobileScreenshots?: ScreenshotAssetInput[];
 	mobileScreenRecordings?: RecordingAssetInput[];
+	textFrames?: TextFrameInput[];
+	textFrame?: TextFrameInput[];
 	timeline?: TimelineReference[];
 };
 
@@ -64,6 +71,7 @@ export type ResolvedProjectScene = {
 	src: string | null;
 	path: string | null;
 	label: string;
+	text: string | null;
 	surface: SceneSurface;
 	mediaType: SceneMediaType;
 	fit: MediaFit;
@@ -104,14 +112,16 @@ const collectionOrder: AssetCollectionName[] = [
 	'desktopScreenshots',
 	'mobileScreenshots',
 	'desktopScreenRecordings',
-	'mobileScreenRecordings'
+	'mobileScreenRecordings',
+	'textFrames'
 ];
 
 const sceneLabels: Record<AssetCollectionName, string> = {
 	desktopScreenshots: 'Desktop Screenshot',
 	desktopScreenRecordings: 'Desktop Recording',
 	mobileScreenshots: 'Mobile Screenshot',
-	mobileScreenRecordings: 'Mobile Recording'
+	mobileScreenRecordings: 'Mobile Recording',
+	textFrames: 'Text Frame'
 };
 
 const normalizeAssetPath = (value: string): string => {
@@ -155,10 +165,18 @@ const toAssetObject = (input: ScreenshotAssetInput | RecordingAssetInput): Asset
 };
 
 const getCollectionSurface = (collection: AssetCollectionName): SceneSurface => {
+	if (collection === 'textFrames') {
+		return 'text';
+	}
+
 	return collection.startsWith('desktop') ? 'desktop' : 'mobile';
 };
 
 const getCollectionMediaType = (collection: AssetCollectionName): SceneMediaType => {
+	if (collection === 'textFrames') {
+		return 'text';
+	}
+
 	return collection.includes('Recordings') ? 'recording' : 'screenshot';
 };
 
@@ -195,6 +213,7 @@ const buildResolvedScene = (
 		src: resolveAssetSrc(path),
 		path,
 		label: createSceneLabel(collection, index, assetObject.label),
+		text: null,
 		surface: getCollectionSurface(collection),
 		mediaType,
 		fit: assetObject.fit ?? 'cover',
@@ -203,6 +222,28 @@ const buildResolvedScene = (
 		trimAfterInFrames:
 			mediaType === 'recording' ? trimBeforeInFrames + durationInFrames : undefined,
 		collection,
+		collectionIndex: index
+	};
+};
+
+const buildResolvedTextScene = (
+	index: number,
+	input: TextFrameInput,
+	fps: number
+): ResolvedProjectScene => {
+	return {
+		id: `textFrames-${index}`,
+		kind: 'text',
+		src: null,
+		path: null,
+		label: createSceneLabel('textFrames', index),
+		text: input.text,
+		surface: 'text',
+		mediaType: 'text',
+		fit: 'contain',
+		durationInFrames: toFrames(input.duration, fps),
+		trimBeforeInFrames: 0,
+		collection: 'textFrames',
 		collectionIndex: index
 	};
 };
@@ -231,6 +272,7 @@ const fallbackScenes = (fps: number): ResolvedProjectScene[] => [
 		src: null,
 		path: null,
 		label: 'Desktop Screenshot 01',
+		text: null,
 		surface: 'desktop',
 		mediaType: 'screenshot',
 		fit: 'cover',
@@ -245,6 +287,7 @@ const fallbackScenes = (fps: number): ResolvedProjectScene[] => [
 		src: null,
 		path: null,
 		label: 'Mobile Screenshot 01',
+		text: null,
 		surface: 'mobile',
 		mediaType: 'screenshot',
 		fit: 'cover',
@@ -323,9 +366,19 @@ export const projectAssetManifest = {
 			}
 		],
 		mobileScreenRecordings: [],
+		textFrames: [{ text: 'Find Ongoing SEC Investigations', duration: 1.6 }, {
+			text: 'Instantly Query All FOIA Requests',
+			duration: 1.6
+		}, {
+			text: "Recieve Email Alerts When New Requests Match Your Search",
+			duration: 1.6
+		}],
 		timeline: [
+			{ collection: 'textFrames', index: 0 },
 			{ collection: 'mobileScreenshots', index: 0 },
+			{ collection: 'textFrames', index: 1 },
 			{ collection: 'desktopScreenRecordings', index: 0 },
+			{ collection: 'textFrames', index: 2 },
 			{ collection: 'mobileScreenshots', index: 1 }
 		]
 	},
@@ -369,6 +422,7 @@ export const projectAssetManifest = {
 export const getProjectTimeline = (projectId: string, fps: number): ProjectTimeline => {
 	const project = getMotionProject(projectId);
 	const config = getProjectAssetConfig(projectId);
+	const configuredTextFrames = config?.textFrames ?? config?.textFrame ?? [];
 	const timings = {
 		screenshotDurationInSeconds:
 			config?.defaults?.screenshotDurationInSeconds ?? defaultTimings.screenshotDurationInSeconds,
@@ -390,7 +444,8 @@ export const getProjectTimeline = (projectId: string, fps: number): ProjectTimel
 		),
 		mobileScreenRecordings: (config?.mobileScreenRecordings ?? []).map((asset, index) =>
 			buildResolvedScene('mobileScreenRecordings', index, asset, fps, timings)
-		)
+		),
+		textFrames: configuredTextFrames.map((frame, index) => buildResolvedTextScene(index, frame, fps))
 	};
 
 	const timelineReferences = config?.timeline?.length ? config.timeline : buildAutoTimeline(collections);

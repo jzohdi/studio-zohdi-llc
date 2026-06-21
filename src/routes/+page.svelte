@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import ProjectDesktopPreview from '$lib/components/home/ProjectDesktopPreview.svelte';
 	import ProjectPreviewCard from '$lib/components/home/ProjectPreviewCard.svelte';
 	import ThemeToggle from '$lib/components/home/ThemeToggle.svelte';
 	import { defaultFeaturedProjectId, featuredProjects } from '$lib/data/featured-projects';
@@ -140,11 +141,7 @@
 									class={`stage-panel ${project.id === activeProjectId ? 'is-active' : ''}`}
 									aria-hidden={project.id !== activeProjectId}
 								>
-									<ProjectPreviewCard
-										{project}
-										size="desktop"
-										isActive={project.id === activeProjectId}
-									/>
+									<ProjectDesktopPreview {project} isActive={project.id === activeProjectId} />
 								</article>
 							{/each}
 						</div>

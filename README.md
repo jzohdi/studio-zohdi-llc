@@ -28,6 +28,7 @@ pnpm lint
 pnpm build
 pnpm preview
 pnpm test
+pnpm video:publish foia-search
 ```
 
 ## Project structure
@@ -38,10 +39,11 @@ pnpm test
 - `src/app.css`: global design tokens, theme variables, resets, shared utilities
 - `src/lib/components/home/`: homepage-specific reusable Svelte components
 - `src/lib/data/featured-projects.ts`: centralized featured project content used by desktop and mobile layouts; currently seeded with the live portfolio lineup plus Greffier as an upcoming product
+- `src/lib/generated/project-preview-media.ts`: generated map of published desktop preview videos, poster frames, and sources
 - `src/lib/utils/theme.ts`: theme resolution, persistence, and DOM application helpers
 - `docs/site-spec.md`: living design and implementation reference for brand, layout, and motion decisions
 - `.cursor/rules/studio-zohdi-website.mdc`: always-on project rule for future agent threads
-- `static/`: public files such as logos, manifest assets, and robots
+- `static/`: public files such as logos, manifest assets, robots, and generated project preview media in `static/project-previews/`
 
 ## Working conventions
 

@@ -7,8 +7,8 @@ Reusable Remotion compositions for project preview videos that can be rendered b
 - One `ProjectPreview-*` composition per project
 - One `PortfolioOverview` composition that chains the full lineup together
 - A manifest-driven asset system in `remotion/src/lib/assets.ts`
-- Any number of desktop screenshots, mobile screenshots, desktop recordings, and mobile recordings per project
-- Automatic scene sequencing with overlapping spring transitions
+- Any number of desktop screenshots, mobile screenshots, desktop recordings, mobile recordings, and text frames per project
+- Automatic scene sequencing with simple slide/fade transitions
 - Palette overrides and per-project timing defaults
 
 ## Commands
@@ -55,32 +55,33 @@ Example shape:
 
 ```ts
 export const projectAssetManifest = {
-  foiaSearch: {
-    projectId: 'foia-search',
-    palette: {
-      highlight: '#2fb879',
-      glow: 'rgba(47, 184, 121, 0.28)',
-    },
-    defaults: {
-      screenshotDurationInSeconds: 1.8,
-      recordingDurationInSeconds: 3.2,
-      transitionDurationInSeconds: 0.6,
-    },
-    desktopScreenshots: [
-      'projects/foia-search/desktop/home-hero.png',
-      { path: 'projects/foia-search/desktop/results.png', durationInSeconds: 2.1 },
-    ],
-    desktopScreenRecordings: [
-      { path: 'projects/foia-search/desktop/video/search-demo.mp4', durationInSeconds: 3.5 },
-    ],
-    mobileScreenshots: [
-      'projects/foia-search/mobile/home.png',
-      'projects/foia-search/mobile/results.png',
-    ],
-    mobileScreenRecordings: [
-      { path: 'projects/foia-search/mobile/video/mobile-search.mp4', durationInSeconds: 2.8 },
-    ],
-  },
+	foiaSearch: {
+		projectId: 'foia-search',
+		palette: {
+			highlight: '#2fb879',
+			glow: 'rgba(47, 184, 121, 0.28)'
+		},
+		defaults: {
+			screenshotDurationInSeconds: 1.8,
+			recordingDurationInSeconds: 3.2,
+			transitionDurationInSeconds: 0.6
+		},
+		desktopScreenshots: [
+			'projects/foia-search/desktop/home-hero.png',
+			{ path: 'projects/foia-search/desktop/results.png', durationInSeconds: 2.1 }
+		],
+		desktopScreenRecordings: [
+			{ path: 'projects/foia-search/desktop/video/search-demo.mp4', durationInSeconds: 3.5 }
+		],
+		mobileScreenshots: [
+			'projects/foia-search/mobile/home.png',
+			'projects/foia-search/mobile/results.png'
+		],
+		mobileScreenRecordings: [
+			{ path: 'projects/foia-search/mobile/video/mobile-search.mp4', durationInSeconds: 2.8 }
+		],
+		textFrames: [{ text: 'Instantly Find B7A\nRequests', duration: 1.6 }]
+	}
 } satisfies Record<string, ProjectAssetConfig>;
 ```
 
@@ -92,17 +93,21 @@ By default, scenes are auto-ordered in this pattern and repeated until assets ru
 2. `mobileScreenshots`
 3. `desktopScreenRecordings`
 4. `mobileScreenRecordings`
+5. `textFrames`
 
 If you want exact manual ordering, add `timeline`:
 
 ```ts
 timeline: [
-  { collection: 'desktopScreenshots', index: 0 },
-  { collection: 'mobileScreenshots', index: 0 },
-  { collection: 'desktopScreenRecordings', index: 0 },
-  { collection: 'desktopScreenshots', index: 1 },
-]
+	{ collection: 'textFrames', index: 0 },
+	{ collection: 'desktopScreenshots', index: 0 },
+	{ collection: 'mobileScreenshots', index: 0 },
+	{ collection: 'desktopScreenRecordings', index: 0 },
+	{ collection: 'desktopScreenshots', index: 1 }
+];
 ```
+
+`textFrames` are most useful with an explicit `timeline` so you can place them exactly where you want them.
 
 ## Asset entry options
 
@@ -122,6 +127,18 @@ Strings are shorthand paths. Object entries support extra control:
 - `trimBeforeInSeconds`: skip the beginning of a recording
 - `fit`: `cover` or `contain`
 - `label`: override the generated scene label
+
+Text frames use a dedicated shape:
+
+```ts
+{
+  text: 'Instantly Find B7A\nRequests',
+  duration: 1.6
+}
+```
+
+- `text`: the full-screen bold text to render; newline characters are respected
+- `duration`: how long the text frame stays on screen, in seconds
 
 ## Suggested capture set
 
@@ -144,10 +161,22 @@ The best results usually come from mixing stills and short motion clips rather t
 
 ## Rendering back into the site
 
-Once you like a composition, render it into a static asset path in the main app:
+Once you like a composition, publish it through the root workspace script:
 
 ```bash
-npm run video:render -- ProjectPreview-foia-search ../static/project-previews/foia-search.mp4
+pnpm video:publish foia-search
 ```
 
-That gives you a ready-to-embed video for the homepage or future case studies.
+That flow:
+
+1. renders `ProjectPreview-foia-search` to `remotion/out/foia-search.mp4`
+2. creates an optimized homepage MP4 at `static/project-previews/foia-search/preview.mp4`
+3. creates a WebM alternate at `static/project-previews/foia-search/preview.webm`
+4. captures the first frame as `static/project-previews/foia-search/poster.jpg`
+5. refreshes `src/lib/generated/project-preview-media.ts` so the Svelte homepage can pick it up
+
+If you already have a fresh render in `remotion/out`, skip the render step:
+
+```bash
+pnpm video:publish foia-search --skip-render
+```

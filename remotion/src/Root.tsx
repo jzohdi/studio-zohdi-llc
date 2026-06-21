@@ -7,7 +7,7 @@ import {getProjectPreviewDurationInFrames} from './lib/assets';
 
 const fps = 30;
 const width = 1920;
-const height = 1080;
+const height = 1280;
 
 export const RemotionRoot: React.FC = () => {
 	return (

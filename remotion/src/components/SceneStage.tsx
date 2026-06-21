@@ -12,8 +12,6 @@ type SceneStageProps = {
 	palette: MotionPalette;
 	projectName: string;
 	scene: ResolvedProjectScene;
-	sceneCount: number;
-	sceneIndex: number;
 	showLockup: boolean;
 	shouldAnimateIn: boolean;
 	shouldAnimateOut: boolean;
@@ -35,6 +33,7 @@ const clampedInterpolation = {
 	extrapolateLeft: 'clamp' as const,
 	extrapolateRight: 'clamp' as const
 };
+
 const getOffscreenMargin = (videoWidth: number): number => {
 	return Math.max(160, Math.round(videoWidth * 0.06));
 };
@@ -47,26 +46,27 @@ const getSceneLabelVariant = (scene: ResolvedProjectScene): 'desktop' | 'mobile'
 	return scene.surface === 'mobile' ? 'mobile' : 'desktop';
 };
 
-const getHeadlineLayout = (showLockup: boolean): CSSProperties => {
+const getTextFrameLayout = (showLockup: boolean): CSSProperties => {
 	return {
-		left: '4.5%',
-		top: showLockup ? '5.5%' : '4.5%',
-		width: '42%',
-		alignItems: 'flex-start',
-		textAlign: 'left'
+		width: '100%',
+		paddingLeft: showLockup ? 92 : 84,
+		paddingRight: showLockup ? 128 : 96
 	};
 };
 
-const getHeadlineFontSize = (label: string): number => {
-	if (label.length >= 34) {
-		return 74;
+const getTextFrameFontSize = (text: string): number => {
+	const lines = text.split('\n');
+	const longestLineLength = lines.reduce((longest, line) => Math.max(longest, line.trim().length), 0);
+
+	if (lines.length >= 4 || longestLineLength >= 34) {
+		return 92;
 	}
 
-	if (label.length >= 24) {
-		return 84;
+	if (lines.length >= 3 || longestLineLength >= 24) {
+		return 108;
 	}
 
-	return 96;
+	return 124;
 };
 
 const getSceneLayoutMetrics = (
@@ -76,7 +76,7 @@ const getSceneLayoutMetrics = (
 	videoHeight: number
 ): SceneLayoutMetrics => {
 	const centerX = videoWidth / 2;
-	const centerY = videoHeight * (showLockup ? 0.54 : 0.5);
+	const centerY = videoHeight * 0.5;
 
 	if (scene.surface === 'desktop' && scene.mediaType === 'recording') {
 		const width = videoWidth * (showLockup ? 0.72 : 0.78);
@@ -110,21 +110,6 @@ const getSceneLayoutMetrics = (
 		};
 	}
 
-	if (scene.mediaType === 'recording') {
-		const width = videoWidth * 0.32;
-		const height = videoHeight * (showLockup ? 0.82 : 0.88);
-
-		return {
-			left: centerX - width / 2,
-			top: centerY - height / 2,
-			width,
-			height,
-			glowWidth: width * 1.9,
-			glowHeight: height * 1.16,
-			glowOpacity: 0.28
-		};
-	}
-
 	const width = videoWidth * 0.29;
 	const height = videoHeight * (showLockup ? 0.76 : 0.82);
 
@@ -152,8 +137,6 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 	palette,
 	projectName,
 	scene,
-	sceneCount,
-	sceneIndex,
 	showLockup,
 	shouldAnimateIn,
 	shouldAnimateOut,
@@ -161,11 +144,17 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 }) => {
 	const frame = useCurrentFrame();
 	const {width, height} = useVideoConfig();
-	const layoutMetrics = getSceneLayoutMetrics(scene, showLockup, width, height);
 	const exitStartFrame = Math.max(0, scene.durationInFrames - transitionDurationInFrames);
 	const exitFrame = frame - exitStartFrame;
-	const incomingOffsetX = getIncomingOffsetX(layoutMetrics, width);
-	const outgoingOffsetX = getOutgoingOffsetX(layoutMetrics, width);
+	const isTextScene = scene.kind === 'text';
+	const layoutMetrics = isTextScene ? null : getSceneLayoutMetrics(scene, showLockup, width, height);
+	const textTravelDistance = width + Math.max(220, Math.round(width * 0.18));
+	const incomingOffsetX = isTextScene
+		? textTravelDistance
+		: getIncomingOffsetX(layoutMetrics!, width);
+	const outgoingOffsetX = isTextScene
+		? -textTravelDistance
+		: getOutgoingOffsetX(layoutMetrics!, width);
 	const enterTranslateX = shouldAnimateIn
 		? interpolate(frame, [0, transitionDurationInFrames], [incomingOffsetX, 0], {
 				easing: Easing.out(Easing.cubic),
@@ -191,14 +180,76 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 			})
 		: 1;
 	const stageOpacity = enterOpacity * exitOpacity;
-	const headlineOpacity = stageOpacity;
 	const translateX = enterTranslateX + exitTranslateX;
-	const glowLeft = layoutMetrics.left + layoutMetrics.width / 2 - layoutMetrics.glowWidth / 2 + translateX;
-	const glowTop = layoutMetrics.top + layoutMetrics.height / 2 - layoutMetrics.glowHeight / 2;
-	const labelVariant = getSceneLabelVariant(scene);
-	const headlineLayout = getHeadlineLayout(showLockup);
-	const headlineFontSize = getHeadlineFontSize(scene.label);
 
+	if (isTextScene) {
+		const textFrameLayout = getTextFrameLayout(showLockup);
+		const textFrameFontSize = getTextFrameFontSize(scene.text ?? '');
+
+		return (
+			<AbsoluteFill style={{pointerEvents: 'none'}}>
+				<div
+					style={{
+						position: 'absolute',
+						left: '50%',
+						top: '50%',
+						width: '82%',
+						height: '52%',
+						background: `radial-gradient(circle at center, ${palette.glow}, transparent 68%)`,
+						filter: 'blur(40px)',
+						transform: `translate(-50%, -50%) translate3d(${translateX}px, 0, 0)`,
+						opacity: stageOpacity * 0.34
+					}}
+				/>
+				<div
+					style={{
+						position: 'absolute',
+						inset: 0,
+						display: 'flex',
+						alignItems: 'center',
+						opacity: stageOpacity,
+						transform: `translate3d(${translateX}px, 0, 0)`
+					}}
+				>
+					<div style={textFrameLayout}>
+						<div
+							style={{
+								maxWidth: 1500,
+								fontFamily: displayFontFamily,
+								fontSize: textFrameFontSize,
+								fontWeight: 700,
+								lineHeight: 0.9,
+								letterSpacing: '-0.055em',
+								whiteSpace: 'pre-wrap',
+								color: overlayTextStrong,
+								textShadow:
+									'0 18px 56px rgba(0,0,0,0.34), 0 2px 0 rgba(255,255,255,0.08)'
+							}}
+						>
+							{scene.text}
+						</div>
+					</div>
+				</div>
+			</AbsoluteFill>
+		);
+	}
+
+	const mediaLayoutMetrics = layoutMetrics;
+
+	if (!mediaLayoutMetrics) {
+		return null;
+	}
+
+	const glowLeft =
+		mediaLayoutMetrics.left +
+		mediaLayoutMetrics.width / 2 -
+		mediaLayoutMetrics.glowWidth / 2 +
+		translateX;
+	const glowTop =
+		mediaLayoutMetrics.top +
+		mediaLayoutMetrics.height / 2 -
+		mediaLayoutMetrics.glowHeight / 2;
+	const labelVariant = getSceneLabelVariant(scene);
 	const stageBody = (
 		<div style={{position: 'relative', width: '100%', height: '100%'}}>
 			<MediaSurface
@@ -221,10 +272,10 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 	);
 
 	const frameStyle: CSSProperties = {
-		left: layoutMetrics.left,
-		top: layoutMetrics.top,
-		width: layoutMetrics.width,
-		height: layoutMetrics.height,
+		left: mediaLayoutMetrics.left,
+		top: mediaLayoutMetrics.top,
+		width: mediaLayoutMetrics.width,
+		height: mediaLayoutMetrics.height,
 		zIndex: 12,
 		opacity: stageOpacity,
 		transform: `translate3d(${translateX}px, 0, 0)`
@@ -237,42 +288,13 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 					position: 'absolute',
 					left: glowLeft,
 					top: glowTop,
-					width: layoutMetrics.glowWidth,
-					height: layoutMetrics.glowHeight,
+					width: mediaLayoutMetrics.glowWidth,
+					height: mediaLayoutMetrics.glowHeight,
 					background: `radial-gradient(circle at center, ${palette.glow}, transparent 68%)`,
 					filter: 'blur(24px)',
-					opacity: stageOpacity * layoutMetrics.glowOpacity
+					opacity: stageOpacity * mediaLayoutMetrics.glowOpacity
 				}}
 			/>
-
-			<div
-				style={{
-					position: 'absolute',
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 0,
-					maxWidth: 860,
-					zIndex: 2,
-					opacity: headlineOpacity,
-					...headlineLayout
-				}}
-			>
-				<div
-					style={{
-						fontFamily: displayFontFamily,
-						fontSize: headlineFontSize,
-						fontWeight: 700,
-						lineHeight: 0.9,
-						letterSpacing: '-0.055em',
-						color: overlayTextStrong,
-						textShadow:
-							'0 18px 56px rgba(0,0,0,0.34), 0 2px 0 rgba(255,255,255,0.08)'
-					}}
-				>
-					{scene.label}
-				</div>
-			</div>
-
 			{scene.surface === 'desktop' ? (
 				<BrowserFrame style={frameStyle} url={domainLabel}>
 					{stageBody}

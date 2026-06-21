@@ -67,8 +67,6 @@ export const ProjectPreview: React.FC<ProjectPreviewProps> = ({
 								palette={timeline.palette}
 								projectName={timeline.project.name}
 								scene={renderScene.scene}
-								sceneCount={timeline.scenes.length}
-								sceneIndex={renderScene.displayIndex}
 								showLockup={showLockup}
 								shouldAnimateIn={renderIndex !== 0}
 								shouldAnimateOut={renderIndex !== renderScenes.length - 1}
