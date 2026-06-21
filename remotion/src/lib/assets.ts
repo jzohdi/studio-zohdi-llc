@@ -83,6 +83,17 @@ export type ProjectTimeline = {
 	anyRealAsset: boolean;
 };
 
+const calculateSequenceDurationInFrames = (
+	scenes: ResolvedProjectScene[],
+	transitionDurationInFrames: number
+): number => {
+	return scenes.reduce((total, scene, index) => {
+		const overlap = index === 0 ? 0 : transitionDurationInFrames;
+
+		return total + scene.durationInFrames - overlap;
+	}, 0);
+};
+
 const defaultTimings = {
 	screenshotDurationInSeconds: 1.8,
 	recordingDurationInSeconds: 3.2,
@@ -278,37 +289,43 @@ export const projectAssetManifest = {
 		desktopScreenshots: [
 			{
 				path: 'projects/foia-search/desktop_1.png',
-				durationInSeconds: 1.95,
+				durationInSeconds: 3.2,
 				fit: 'contain',
 				label: 'Homepage Overview'
 			},
 			{
 				path: 'projects/foia-search/desktop_2.png',
-				durationInSeconds: 2.15,
+				durationInSeconds: 4.2,
 				fit: 'contain',
 				label: 'Search Results Detail'
 			}
 		],
-		desktopScreenRecordings: [],
+		desktopScreenRecordings: [
+			{
+				path: 'projects/foia-search/desktop_recording_1.mp4',
+				durationInSeconds: 6,
+				fit: 'contain',
+				label: 'Instantly Find B7A Requests'
+			}
+		],
 		mobileScreenshots: [
 			{
 				path: 'projects/foia-search/mobile_1.png',
-				durationInSeconds: 1.85,
+				durationInSeconds: 3.2,
 				fit: 'contain',
 				label: 'Mobile Results View'
 			},
 			{
 				path: 'projects/foia-search/mobile_2.png',
-				durationInSeconds: 2.15,
+				durationInSeconds: 4.2,
 				fit: 'contain',
 				label: 'Email Alerts Based on Search Results'
 			}
 		],
 		mobileScreenRecordings: [],
 		timeline: [
-			{ collection: 'desktopScreenshots', index: 0 },
 			{ collection: 'mobileScreenshots', index: 0 },
-			{ collection: 'desktopScreenshots', index: 1 },
+			{ collection: 'desktopScreenRecordings', index: 0 },
 			{ collection: 'mobileScreenshots', index: 1 }
 		]
 	},
@@ -392,11 +409,10 @@ export const getProjectTimeline = (projectId: string, fps: number): ProjectTimel
 		getTransitionDurationInFrames(config, fps),
 		maxTransitionDurationInFrames
 	);
-	const totalDurationInFrames = normalizedScenes.reduce((total, scene, index) => {
-		const overlap = index === 0 ? 0 : transitionDurationInFrames;
-
-		return total + scene.durationInFrames - overlap;
-	}, 0);
+	const totalDurationInFrames = calculateSequenceDurationInFrames(
+		normalizedScenes,
+		transitionDurationInFrames
+	);
 
 	return {
 		project,
@@ -406,6 +422,22 @@ export const getProjectTimeline = (projectId: string, fps: number): ProjectTimel
 		totalDurationInFrames,
 		anyRealAsset: scenes.length > 0
 	};
+};
+
+export const getLoopedProjectScenes = (scenes: ResolvedProjectScene[]): ResolvedProjectScene[] => {
+	if (scenes.length < 2) {
+		return scenes;
+	}
+
+	const firstScene = scenes[0];
+
+	return [
+		...scenes,
+		{
+			...firstScene,
+			id: `${firstScene.id}-loop-return`
+		}
+	];
 };
 
 export const getProjectSceneStartFrames = (
@@ -427,4 +459,13 @@ export const getPortfolioOverviewDurationInFrames = (fps: number): number => {
 	return motionProjects.reduce((total, project) => {
 		return total + getProjectTimeline(project.id, fps).totalDurationInFrames;
 	}, 0);
+};
+
+export const getProjectPreviewDurationInFrames = (projectId: string, fps: number): number => {
+	const timeline = getProjectTimeline(projectId, fps);
+
+	return calculateSequenceDurationInFrames(
+		getLoopedProjectScenes(timeline.scenes),
+		timeline.transitionDurationInFrames
+	);
 };

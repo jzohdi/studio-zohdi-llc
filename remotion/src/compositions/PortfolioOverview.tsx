@@ -143,7 +143,7 @@ export const PortfolioOverview: React.FC = () => {
 						from={from}
 						durationInFrames={timeline.totalDurationInFrames}
 					>
-						<ProjectPreview projectId={timeline.project.id} showLockup={false} />
+						<ProjectPreview projectId={timeline.project.id} showLockup={false} loopToFirst={false} />
 						<OverviewTitleCard
 							durationInFrames={timeline.totalDurationInFrames}
 							label="Desktop app preview"

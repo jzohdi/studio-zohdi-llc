@@ -2,96 +2,76 @@ import React, {useMemo} from 'react';
 import {AbsoluteFill, Series, useCurrentFrame, useVideoConfig} from 'remotion';
 import {Background} from '../components/Background';
 import {SceneStage} from '../components/SceneStage';
-import {getProjectSceneStartFrames, getProjectTimeline} from '../lib/assets';
+import {
+	getLoopedProjectScenes,
+	getProjectSceneStartFrames,
+	getProjectTimeline,
+	type ResolvedProjectScene
+} from '../lib/assets';
 import {bodyFontFamily, displayFontFamily} from '../lib/fonts';
 
 export type ProjectPreviewProps = {
 	projectId: string;
 	showLockup?: boolean;
+	loopToFirst?: boolean;
 };
 
-const overlayTextStrong = 'rgba(246, 250, 249, 0.96)';
-const overlayTextMuted = 'rgba(220, 233, 229, 0.74)';
+type RenderScene = {
+	key: string;
+	scene: ResolvedProjectScene;
+	displayIndex: number;
+};
 
-export const ProjectPreview: React.FC<ProjectPreviewProps> = ({projectId, showLockup = true}) => {
+export const ProjectPreview: React.FC<ProjectPreviewProps> = ({
+	projectId,
+	showLockup = true,
+	loopToFirst = true
+}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 	const timeline = useMemo(() => getProjectTimeline(projectId, fps), [projectId, fps]);
+	const renderScenes = useMemo<RenderScene[]>(() => {
+		const previewScenes = loopToFirst ? getLoopedProjectScenes(timeline.scenes) : timeline.scenes;
+
+		return previewScenes.map((scene, index) => ({
+			key: scene.id,
+			scene,
+			displayIndex: index >= timeline.scenes.length ? 0 : index
+		}));
+	}, [loopToFirst, timeline.scenes]);
 	const sceneStartFrames = useMemo(() => {
-		return getProjectSceneStartFrames(timeline.scenes, timeline.transitionDurationInFrames);
-	}, [timeline.scenes, timeline.transitionDurationInFrames]);
-	const currentSceneIndex = sceneStartFrames.reduce((activeIndex, startFrame, index) => {
+		return getProjectSceneStartFrames(
+			renderScenes.map((renderScene) => renderScene.scene),
+			timeline.transitionDurationInFrames
+		);
+	}, [renderScenes, timeline.transitionDurationInFrames]);
+	const currentRenderSceneIndex = sceneStartFrames.reduce((activeIndex, startFrame, index) => {
 		return frame >= startFrame ? index : activeIndex;
 	}, 0);
+	const currentSceneIndex = renderScenes[currentRenderSceneIndex]?.displayIndex ?? 0;
 	const domainLabel = timeline.project.website?.replace(/^https?:\/\//, '') ?? 'Desktop app preview';
 
 	return (
 		<AbsoluteFill style={{color: timeline.palette.label, fontFamily: bodyFontFamily}}>
 			<Background palette={timeline.palette} />
 			<AbsoluteFill style={{padding: '68px 78px 62px'}}>
-				{showLockup ? (
-					<div
-						style={{
-							position: 'absolute',
-							top: 68,
-							right: 78,
-							display: 'flex',
-							justifyContent: 'flex-end',
-							zIndex: 10
-						}}
-					>
-						<div
-							style={{
-								maxWidth: 320,
-								padding: 22,
-								borderRadius: 28,
-								background: 'rgba(6, 16, 15, 0.48)',
-								boxShadow:
-									'0 24px 70px rgba(0, 0, 0, 0.26), inset 0 0 0 1px rgba(255,255,255,0.12)',
-								backdropFilter: 'blur(24px)'
-							}}
-						>
-							<div
-								style={{
-									fontFamily: displayFontFamily,
-									fontSize: 18,
-									fontWeight: 700,
-									letterSpacing: '0.08em',
-									textTransform: 'uppercase',
-									color: overlayTextStrong
-								}}
-							>
-								{timeline.project.status === 'live' ? 'Live project' : 'Project in progress'}
-							</div>
-							<div
-								style={{
-									marginTop: 10,
-									fontSize: 18,
-									lineHeight: 1.45,
-									color: overlayTextMuted
-								}}
-							>
-								{timeline.project.summary}
-							</div>
-						</div>
-					</div>
-				) : null}
-
 				<Series>
-					{timeline.scenes.map((scene, index) => (
+					{renderScenes.map((renderScene, renderIndex) => (
 						<Series.Sequence
-							key={scene.id}
-							durationInFrames={scene.durationInFrames}
-							offset={index === 0 ? 0 : -timeline.transitionDurationInFrames}
+							key={renderScene.key}
+							durationInFrames={renderScene.scene.durationInFrames}
+							offset={renderIndex === 0 ? 0 : -timeline.transitionDurationInFrames}
 						>
 							<SceneStage
 								domainLabel={domainLabel}
 								palette={timeline.palette}
 								projectName={timeline.project.name}
-								scene={scene}
+								scene={renderScene.scene}
 								sceneCount={timeline.scenes.length}
-								sceneIndex={index}
+								sceneIndex={renderScene.displayIndex}
 								showLockup={showLockup}
+								shouldAnimateIn={renderIndex !== 0}
+								shouldAnimateOut={renderIndex !== renderScenes.length - 1}
 								transitionDurationInFrames={timeline.transitionDurationInFrames}
 							/>
 						</Series.Sequence>

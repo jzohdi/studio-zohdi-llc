@@ -2,8 +2,8 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {motionProjects} from './data/projects';
 import {PortfolioOverview, portfolioOverviewDurationInFrames} from './compositions/PortfolioOverview';
-import {ProjectPreview, type ProjectPreviewProps} from './compositions/ProjectPreview';
-import {getProjectTimeline} from './lib/assets';
+import {ProjectPreview} from './compositions/ProjectPreview';
+import {getProjectPreviewDurationInFrames} from './lib/assets';
 
 const fps = 30;
 const width = 1920;
@@ -25,13 +25,14 @@ export const RemotionRoot: React.FC = () => {
 					key={project.id}
 					id={`ProjectPreview-${project.id}`}
 					component={ProjectPreview}
-					durationInFrames={getProjectTimeline(project.id, fps).totalDurationInFrames}
+					durationInFrames={getProjectPreviewDurationInFrames(project.id, fps)}
 					fps={fps}
 					width={width}
 					height={height}
 					defaultProps={{
 						projectId: project.id,
-						showLockup: true
+						showLockup: true,
+						loopToFirst: true
 					}}
 				/>
 			))}
