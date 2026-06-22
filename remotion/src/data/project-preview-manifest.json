@@ -116,37 +116,362 @@
 	},
 	"stockPromotionTracker": {
 		"projectId": "stock-promotion-tracker",
-		"desktopScreenshots": [],
-		"desktopScreenRecordings": [],
-		"mobileScreenshots": [],
-		"mobileScreenRecordings": []
+		"defaults": {
+			"screenshotDurationInSeconds": 3,
+			"transitionDurationInSeconds": 0.7
+		},
+		"desktopScreenshots": [
+			{
+				"path": "projects/stock-promotion-tracker/desktop_1.png",
+				"durationInSeconds": 2.5,
+				"fit": "contain",
+				"label": "Homepage Overview"
+			}
+		],
+		"desktopScreenRecordings": [
+			{
+				"path": "projects/stock-promotion-tracker/spt_desktop_recording_1.mp4",
+				"durationInSeconds": 9.6,
+				"fit": "contain",
+				"label": "Desktop Demo"
+			}
+		],
+		"mobileScreenshots": [
+			{
+				"path": "projects/stock-promotion-tracker/spt_mobile_screenshot_1.png",
+				"durationInSeconds": 3,
+				"fit": "contain",
+				"label": "Performance Analysis"
+			}
+		],
+		"mobileScreenRecordings": [
+			{
+				"path": "projects/stock-promotion-tracker/spt_mobile_recording_1.mp4",
+				"durationInSeconds": 12,
+				"fit": "contain",
+				"label": "Mobile Demo"
+			}
+		],
+		"textFrames": [
+			{
+				"text": "Hourly updates on stock promotions from hundreds of sources",
+				"duration": 2.1
+			},
+			{
+				"text": "Performance analysis",
+				"duration": 1.8
+			},
+			{
+				"text": "Track how tickers perform before, during, and after promotions",
+				"duration": 2.2
+			}
+		],
+		"timeline": [
+			{
+				"collection": "desktopScreenshots",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 0
+			},
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 1
+			},
+			{
+				"collection": "mobileScreenshots",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 2
+			},
+			{
+				"collection": "mobileScreenRecordings",
+				"index": 0
+			}
+		],
+		"homepage": {
+			"mobilePoster": {
+				"collection": "desktopScreenshots",
+				"index": 0
+			}
+		}
 	},
 	"stopNasdaqChinaFraud": {
 		"projectId": "stop-nasdaq-china-fraud",
-		"desktopScreenshots": [],
-		"desktopScreenRecordings": [],
+		"defaults": {
+			"screenshotDurationInSeconds": 3.4,
+			"transitionDurationInSeconds": 0.7
+		},
+		"desktopScreenshots": [
+			{
+				"path": "projects/stop-nasdaq-china-fraud/desktop_1_sec.png",
+				"durationInSeconds": 3.8,
+				"fit": "contain",
+				"label": "SEC Hearing Screenshot"
+			}
+		],
+		"desktopScreenRecordings": [
+			{
+				"path": "projects/stop-nasdaq-china-fraud/sncf_desktop_recording_1.mp4",
+				"durationInSeconds": 5,
+				"fit": "contain",
+				"label": "Desktop Demo"
+			}
+		],
 		"mobileScreenshots": [],
-		"mobileScreenRecordings": []
+		"mobileScreenRecordings": [
+			{
+				"path": "projects/stop-nasdaq-china-fraud/sncf_mobile_recording_1.mp4",
+				"durationInSeconds": 5,
+				"fit": "contain",
+				"label": "API Used by Hedge Funds and Retail Investors"
+			}
+		],
+		"textFrames": [
+			{
+				"text": "Referenced by the SEC During Investigation of Fraudulent IPOs",
+				"duration": 2.4
+			},
+			{
+				"text": "API Used by Hedge Funds and Retail Investors",
+				"duration": 1.9
+			}
+		],
+		"timeline": [
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 0
+			},
+			{
+				"collection": "desktopScreenshots",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 1
+			},
+			{
+				"collection": "mobileScreenRecordings",
+				"index": 0
+			}
+		],
+		"homepage": {
+			"mobilePoster": {
+				"collection": "desktopScreenshots",
+				"index": 0
+			}
+		}
 	},
 	"highGroundResearch": {
 		"projectId": "highgroundresearch",
-		"desktopScreenshots": [],
-		"desktopScreenRecordings": [],
-		"mobileScreenshots": [],
-		"mobileScreenRecordings": []
+		"defaults": {
+			"screenshotDurationInSeconds": 3.2,
+			"transitionDurationInSeconds": 0.7
+		},
+		"desktopScreenshots": [
+			{
+				"path": "projects/highgroundresearch/desktop_1.png",
+				"durationInSeconds": 3.2,
+				"fit": "contain",
+				"label": "Signal Analysis"
+			}
+		],
+		"desktopScreenRecordings": [
+			{
+				"path": "projects/highgroundresearch/desktop_recording_1.mp4",
+				"durationInSeconds": 4.05,
+				"fit": "contain",
+				"label": "Desktop Demo 01"
+			},
+			{
+				"path": "projects/highgroundresearch/desktop_recording_2.mp4",
+				"durationInSeconds": 4.03,
+				"fit": "contain",
+				"label": "Desktop Demo 02"
+			}
+		],
+		"mobileScreenshots": [
+			{
+				"path": "projects/highgroundresearch/mobilePreview.png",
+				"durationInSeconds": 3.2,
+				"fit": "contain",
+				"label": "Prediction Market Intelligence"
+			}
+		],
+		"mobileScreenRecordings": [
+			{
+				"path": "projects/highgroundresearch/mobile_recording_1.mp4",
+				"durationInSeconds": 4.03,
+				"fit": "contain",
+				"label": "Market Alerts"
+			}
+		],
+		"textFrames": [
+			{
+				"text": "See where the sharp money is trading",
+				"duration": 2.1
+			},
+			{
+				"text": "Live feed of top trader activity",
+				"duration": 2
+			},
+			{
+				"text": "Market alerts based on powerful configurations",
+				"duration": 2.2
+			}
+		],
+		"timeline": [
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 0
+			},
+			{
+				"collection": "desktopScreenshots",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 1
+			},
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 1
+			},
+			{
+				"collection": "textFrames",
+				"index": 2
+			},
+			{
+				"collection": "mobileScreenRecordings",
+				"index": 0
+			}
+		],
+		"homepage": {
+			"mobilePoster": {
+				"collection": "mobileScreenshots",
+				"index": 0
+			}
+		}
 	},
 	"greffier": {
 		"projectId": "greffier",
-		"desktopScreenshots": [],
+		"defaults": {
+			"screenshotDurationInSeconds": 3.2,
+			"transitionDurationInSeconds": 0.7
+		},
+		"desktopScreenshots": [
+			{
+				"path": "projects/greffier/desktop_1.png",
+				"durationInSeconds": 3.2,
+				"fit": "contain",
+				"label": "Homepage Overview"
+			}
+		],
 		"desktopScreenRecordings": [],
 		"mobileScreenshots": [],
-		"mobileScreenRecordings": []
+		"mobileScreenRecordings": [],
+		"textFrames": [
+			{
+				"text": "Coming Soon",
+				"duration": 1.8
+			}
+		],
+		"timeline": [
+			{
+				"collection": "desktopScreenshots",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 0
+			}
+		],
+		"homepage": {
+			"mobilePoster": {
+				"collection": "desktopScreenshots",
+				"index": 0
+			}
+		}
 	},
 	"search8k": {
 		"projectId": "8ksearch",
+		"sourceFolder": "search8k",
+		"defaults": {
+			"screenshotDurationInSeconds": 3.2,
+			"transitionDurationInSeconds": 0.7
+		},
 		"desktopScreenshots": [],
-		"desktopScreenRecordings": [],
-		"mobileScreenshots": [],
-		"mobileScreenRecordings": []
+		"desktopScreenRecordings": [
+			{
+				"path": "projects/search8k/desktop_recording_1.mp4",
+				"durationInSeconds": 5.78,
+				"fit": "contain",
+				"label": "Desktop Demo 01"
+			},
+			{
+				"path": "projects/search8k/desktop_recording_2.mp4",
+				"durationInSeconds": 11.47,
+				"fit": "contain",
+				"label": "Desktop Demo 02"
+			}
+		],
+		"mobileScreenshots": [
+			{
+				"path": "projects/search8k/mobilePreview.png",
+				"durationInSeconds": 3.2,
+				"fit": "contain",
+				"label": "Advanced Query Builder"
+			}
+		],
+		"mobileScreenRecordings": [],
+		"textFrames": [
+			{
+				"text": "Find the SEC filings that companies don't want you to see",
+				"duration": 2.2
+			},
+			{
+				"text": "Build advanced queries for noteworthy results",
+				"duration": 2.1
+			}
+		],
+		"timeline": [
+			{
+				"collection": "textFrames",
+				"index": 0
+			},
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 1
+			},
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 1
+			}
+		],
+		"homepage": {
+			"mobilePoster": {
+				"collection": "mobileScreenshots",
+				"index": 0
+			}
+		}
 	}
 }

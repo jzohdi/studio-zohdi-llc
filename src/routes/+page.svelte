@@ -102,12 +102,15 @@
 
 		<div class="topbar__desktop">
 			<ThemeToggle {theme} onToggle={handleThemeToggle} />
-			<span class="topbar__text-control">MENU</span>
-			<span class="topbar__text-control topbar__text-control--cta">LET'S TALK!</span>
+			<a
+				class="topbar__text-control topbar__text-control--cta"
+				href="mailto:jake@studio-zohdi-llc.com"
+			>
+				LET'S TALK!
+			</a>
 		</div>
 
 		<div class="topbar__mobile">
-			<span class="topbar__text-control">MENU</span>
 			<ThemeToggle {theme} onToggle={handleThemeToggle} variant="compact" />
 		</div>
 	</header>
@@ -233,10 +236,13 @@
 	}
 
 	.topbar__text-control {
+		display: inline-flex;
+		align-items: center;
 		font-family: var(--font-display);
 		font-size: 0.72rem;
 		font-weight: 500;
 		letter-spacing: 0.22em;
+		text-decoration: none;
 		text-transform: uppercase;
 		white-space: nowrap;
 	}
@@ -473,7 +479,7 @@
 		.topbar__mobile {
 			display: flex;
 			width: 100%;
-			justify-content: space-between;
+			justify-content: flex-end;
 		}
 
 		.mobile-showcase {

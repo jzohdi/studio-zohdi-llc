@@ -64,6 +64,7 @@ type ResolvedProjectAssetDefaults = {
 
 export type ProjectAssetConfig = {
 	projectId: string;
+	sourceFolder?: string;
 	palette?: Partial<MotionPalette>;
 	defaults?: ProjectAssetDefaults;
 	desktopScreenshots?: ScreenshotAssetInput[];

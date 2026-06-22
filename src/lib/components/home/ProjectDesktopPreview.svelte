@@ -225,6 +225,9 @@
 
 <style>
 	.project-desktop-preview {
+		--preview-outer-radius: clamp(0.8rem, 1.7vw, 1.05rem);
+		--preview-inner-radius: clamp(0.58rem, 1.25vw, 0.8rem);
+		--preview-scene-radius: clamp(0.48rem, 1vw, 0.72rem);
 		--preview-shell-start: rgb(255 255 255 / 0.92);
 		--preview-shell-end: rgb(239 241 248 / 0.78);
 		--preview-scene-start: rgb(250 251 254 / 0.96);
@@ -240,7 +243,7 @@
 		position: relative;
 		width: 100%;
 		aspect-ratio: 3 / 2;
-		border-radius: clamp(1.45rem, 3vw, 2.35rem);
+		border-radius: var(--preview-outer-radius);
 		overflow: hidden;
 		isolation: isolate;
 		box-shadow: var(--shadow-card);
@@ -325,7 +328,7 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		border-radius: clamp(1rem, 2vw, 1.65rem);
+		border-radius: var(--preview-inner-radius);
 		overflow: hidden;
 		background:
 			linear-gradient(160deg, var(--preview-shell-start), var(--preview-shell-end)),
@@ -412,7 +415,7 @@
 		place-items: center;
 		width: 100%;
 		height: 100%;
-		border-radius: clamp(1rem, 2vw, 1.45rem);
+		border-radius: var(--preview-scene-radius);
 		overflow: hidden;
 		background:
 			linear-gradient(160deg, var(--preview-scene-start), var(--preview-scene-end)),

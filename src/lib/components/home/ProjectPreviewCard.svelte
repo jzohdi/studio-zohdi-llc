@@ -43,10 +43,12 @@
 
 <style>
 	.preview-card {
+		--preview-outer-radius: clamp(0.8rem, 1.8vw, 1.05rem);
+		--preview-inner-radius: clamp(0.58rem, 1.4vw, 0.8rem);
 		position: relative;
 		width: 100%;
 		aspect-ratio: 1.48 / 1;
-		border-radius: clamp(1.45rem, 3vw, 2.35rem);
+		border-radius: var(--preview-outer-radius);
 		overflow: hidden;
 		isolation: isolate;
 		box-shadow: var(--shadow-card);
@@ -78,7 +80,7 @@
 		height: 100%;
 		padding: clamp(0.9rem, 2vw, 1.35rem);
 		border: 1px solid hsl(0 0% 100% / 0.35);
-		border-radius: inherit;
+		border-radius: var(--preview-inner-radius);
 	}
 
 	.preview-card__surface::after {

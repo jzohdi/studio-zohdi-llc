@@ -110,6 +110,8 @@ async function publishProjectCarousel(projectId, manifest) {
 		throw new Error(`No project preview manifest entry found for "${projectId}".`);
 	}
 
+	const projectSourceFolder = config.sourceFolder ?? projectId;
+
 	const timings = {
 		screenshotDurationInSeconds:
 			config.defaults?.screenshotDurationInSeconds ?? defaultTimings.screenshotDurationInSeconds,
@@ -177,6 +179,7 @@ async function publishProjectCarousel(projectId, manifest) {
 		const source = await copyProjectAsset({
 			normalizedPath: scene.path,
 			projectId,
+			projectSourceFolder,
 			carouselAssetsDir,
 			copiedAssets
 		});
@@ -197,6 +200,7 @@ async function publishProjectCarousel(projectId, manifest) {
 	const mobilePoster = mobilePosterScene
 		? await exportMobilePoster({
 				projectId,
+				projectSourceFolder,
 				scene: mobilePosterScene,
 				carouselAssetsDir,
 				copiedAssets
@@ -420,10 +424,16 @@ function toMilliseconds(seconds) {
 	return Math.max(1, Math.round(seconds * 1000));
 }
 
-async function exportMobilePoster({ projectId, scene, carouselAssetsDir, copiedAssets }) {
-	if (scene.surface !== 'mobile' || scene.kind !== 'image' || !scene.path) {
+async function exportMobilePoster({
+	projectId,
+	projectSourceFolder,
+	scene,
+	carouselAssetsDir,
+	copiedAssets
+}) {
+	if (scene.kind !== 'image' || scene.mediaType !== 'screenshot' || !scene.path) {
 		throw new Error(
-			`${projectId}:homepage.mobilePoster must reference a mobile screenshot scene with a file path.`
+			`${projectId}:homepage.mobilePoster must reference a screenshot scene with a file path.`
 		);
 	}
 
@@ -433,6 +443,7 @@ async function exportMobilePoster({ projectId, scene, carouselAssetsDir, copiedA
 		...(await copyProjectAsset({
 			normalizedPath: scene.path,
 			projectId,
+			projectSourceFolder,
 			carouselAssetsDir,
 			copiedAssets
 		}))
@@ -455,10 +466,16 @@ function assertPositiveNumber(value, message) {
 	return value;
 }
 
-async function copyProjectAsset({ normalizedPath, projectId, carouselAssetsDir, copiedAssets }) {
+async function copyProjectAsset({
+	normalizedPath,
+	projectId,
+	projectSourceFolder,
+	carouselAssetsDir,
+	copiedAssets
+}) {
 	if (normalizedPath.startsWith('http://') || normalizedPath.startsWith('https://')) {
 		throw new Error(
-			`Remote asset "${normalizedPath}" cannot be exported for the homepage carousel. Use files inside remotion/public/projects/${projectId}/ instead.`
+			`Remote asset "${normalizedPath}" cannot be exported for the homepage carousel. Use files inside remotion/public/projects/${projectSourceFolder}/ instead.`
 		);
 	}
 
@@ -466,7 +483,7 @@ async function copyProjectAsset({ normalizedPath, projectId, carouselAssetsDir, 
 		return copiedAssets.get(normalizedPath);
 	}
 
-	const projectPrefix = `projects/${projectId}/`;
+	const projectPrefix = `projects/${projectSourceFolder}/`;
 
 	if (!normalizedPath.startsWith(projectPrefix)) {
 		throw new Error(
