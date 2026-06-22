@@ -38,8 +38,8 @@
 
 <style>
 	.project-mobile-preview {
-		--preview-outer-radius: clamp(0.78rem, 2vw, 0.98rem);
-		--preview-inner-radius: clamp(0.58rem, 1.65vw, 0.76rem);
+		--preview-outer-radius: clamp(0.4rem, 1vw, 0.9rem);
+		--preview-inner-radius: clamp(0.48rem, 1.05vw, 0.64rem);
 		--preview-shell-start: rgb(255 255 255 / 0.95);
 		--preview-shell-end: rgb(239 241 248 / 0.82);
 		--preview-scene-start: rgb(248 250 253 / 0.98);
@@ -107,7 +107,7 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		border: 1px solid hsl(0 0% 100% / 0.35);
+		/* border: 1px solid hsl(0 0% 100% / 0.35); */
 		border-radius: inherit;
 		background:
 			linear-gradient(155deg, var(--preview-shell-start), var(--preview-shell-end)),
@@ -127,7 +127,7 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
-		border-radius: var(--preview-inner-radius);
+		/* border-radius: var(--preview-inner-radius); */
 		overflow: hidden;
 		background:
 			linear-gradient(160deg, var(--preview-scene-start), var(--preview-scene-end)),

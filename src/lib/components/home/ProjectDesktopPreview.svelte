@@ -225,9 +225,9 @@
 
 <style>
 	.project-desktop-preview {
-		--preview-outer-radius: clamp(0.8rem, 1.7vw, 1.05rem);
-		--preview-inner-radius: clamp(0.58rem, 1.25vw, 0.8rem);
-		--preview-scene-radius: clamp(0.48rem, 1vw, 0.72rem);
+		--preview-outer-radius: clamp(0.4rem, 1vw, 0.9rem);
+		--preview-inner-radius: clamp(0.4rem, 1vw, 0.64rem);
+		--preview-scene-radius: clamp(0.38rem, 0.82vw, 0.54rem);
 		--preview-shell-start: rgb(255 255 255 / 0.92);
 		--preview-shell-end: rgb(239 241 248 / 0.78);
 		--preview-scene-start: rgb(250 251 254 / 0.96);

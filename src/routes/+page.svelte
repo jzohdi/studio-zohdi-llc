@@ -389,7 +389,7 @@
 		left: 0;
 		top: 0;
 		z-index: 20;
-		padding: 0.6rem 1.05rem;
+		padding: 0.7rem 1.05rem;
 		border-radius: 0.65rem;
 		background: hsl(var(--pink));
 		box-shadow: 0 20px 44px hsl(var(--pink) / 0.28);
