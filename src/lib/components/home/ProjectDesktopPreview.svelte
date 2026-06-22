@@ -87,6 +87,32 @@
 	});
 </script>
 
+{#snippet carouselSceneMedia()}
+	{#if currentScene}
+		{#if currentScene.kind === 'video' && currentScene.sourceUrl}
+			<video
+				class="preview-carousel__media"
+				autoplay={shouldAnimateMedia}
+				muted
+				playsinline
+				preload={shouldAnimateMedia ? 'auto' : 'metadata'}
+				{@attach syncPreviewVideo(shouldAnimateMedia)}
+			>
+				<source src={currentScene.sourceUrl} type={currentScene.source?.type ?? 'video/mp4'} />
+			</video>
+		{:else if currentScene.sourceUrl}
+			<img
+				class="preview-carousel__media"
+				src={currentScene.sourceUrl}
+				alt=""
+				decoding="async"
+				draggable="false"
+				loading="lazy"
+			/>
+		{/if}
+	{/if}
+{/snippet}
+
 {#if hasCarousel && currentScene}
 	<div
 		class="project-desktop-preview"
@@ -128,55 +154,11 @@
 										<div class="preview-carousel__device-notch"></div>
 
 										<div class="preview-carousel__device-screen">
-											{#if currentScene.kind === 'video' && currentScene.sourceUrl}
-												<video
-													class="preview-carousel__media"
-													autoplay={shouldAnimateMedia}
-													muted
-													playsinline
-													preload={shouldAnimateMedia ? 'auto' : 'metadata'}
-													{@attach syncPreviewVideo(shouldAnimateMedia)}
-												>
-													<source
-														src={currentScene.sourceUrl}
-														type={currentScene.source?.type ?? 'video/mp4'}
-													/>
-												</video>
-											{:else if currentScene.sourceUrl}
-												<img
-													class="preview-carousel__media"
-													src={currentScene.sourceUrl}
-													alt=""
-													decoding="async"
-													draggable="false"
-													loading="lazy"
-												/>
-											{/if}
+											{@render carouselSceneMedia()}
 										</div>
 									</div>
-								{:else if currentScene.kind === 'video' && currentScene.sourceUrl}
-									<video
-										class="preview-carousel__media"
-										autoplay={shouldAnimateMedia}
-										muted
-										playsinline
-										preload={shouldAnimateMedia ? 'auto' : 'metadata'}
-										{@attach syncPreviewVideo(shouldAnimateMedia)}
-									>
-										<source
-											src={currentScene.sourceUrl}
-											type={currentScene.source?.type ?? 'video/mp4'}
-										/>
-									</video>
-								{:else if currentScene.sourceUrl}
-									<img
-										class="preview-carousel__media"
-										src={currentScene.sourceUrl}
-										alt=""
-										decoding="async"
-										draggable="false"
-										loading="lazy"
-									/>
+								{:else}
+									{@render carouselSceneMedia()}
 								{/if}
 							</div>
 						{/key}
