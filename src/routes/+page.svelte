@@ -4,7 +4,7 @@
 	import ProjectDesktopPreview from '$lib/components/home/ProjectDesktopPreview.svelte';
 	import ProjectMobilePreview from '$lib/components/home/ProjectMobilePreview.svelte';
 	import { preloadProjectPreviewAssets } from '$lib/components/home/project-preview-assets';
-	import ThemeToggle from '$lib/components/home/ThemeToggle.svelte';
+	import Topbar from '$lib/components/home/Topbar.svelte';
 	import { defaultFeaturedProjectId, featuredProjects } from '$lib/data/featured-projects';
 	import {
 		applyTheme,
@@ -97,23 +97,7 @@
 </svelte:head>
 
 <div class="home-shell">
-	<header class="topbar container" aria-label="Top bar">
-		<div class="topbar__rule" aria-hidden="true"></div>
-
-		<div class="topbar__desktop">
-			<ThemeToggle {theme} onToggle={handleThemeToggle} />
-			<a
-				class="topbar__text-control topbar__text-control--cta"
-				href="mailto:jake@studio-zohdi-llc.com"
-			>
-				LET'S TALK!
-			</a>
-		</div>
-
-		<div class="topbar__mobile">
-			<ThemeToggle {theme} onToggle={handleThemeToggle} variant="compact" />
-		</div>
-	</header>
+	<Topbar {theme} onToggle={handleThemeToggle} />
 
 	<main class="container home-main">
 		<section class="home-hero" aria-labelledby="homepage-title">
@@ -209,46 +193,6 @@
 	.home-shell {
 		min-height: 100svh;
 		padding-block: var(--page-padding-block) clamp(1.75rem, 4vw, 3rem);
-	}
-
-	.topbar {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		padding-block: 0.35rem 1.15rem;
-	}
-
-	.topbar__rule {
-		flex: 1;
-		height: 1px;
-		background: linear-gradient(90deg, hsl(var(--foreground) / 0.16), transparent 72%);
-	}
-
-	.topbar__desktop,
-	.topbar__mobile {
-		display: flex;
-		align-items: center;
-		gap: clamp(0.9rem, 2vw, 1.5rem);
-	}
-
-	.topbar__mobile {
-		display: none;
-	}
-
-	.topbar__text-control {
-		display: inline-flex;
-		align-items: center;
-		font-family: var(--font-display);
-		font-size: 0.72rem;
-		font-weight: 500;
-		letter-spacing: 0.22em;
-		text-decoration: none;
-		text-transform: uppercase;
-		white-space: nowrap;
-	}
-
-	.topbar__text-control--cta {
-		color: hsl(var(--pink) / 0.74);
 	}
 
 	.home-main {
@@ -466,20 +410,8 @@
 	}
 
 	@media (max-width: 900px) {
-		.topbar {
-			padding-bottom: 1rem;
-		}
-
-		.topbar__rule,
-		.topbar__desktop,
 		.desktop-showcase {
 			display: none;
-		}
-
-		.topbar__mobile {
-			display: flex;
-			width: 100%;
-			justify-content: flex-end;
 		}
 
 		.mobile-showcase {
