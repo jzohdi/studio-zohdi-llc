@@ -14,21 +14,23 @@
 
 	let { project, isActive }: Props = $props();
 
-	const prefersReducedMotion = new MediaQuery('prefers-reduced-motion: reduce', true);
+	const prefersReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)', true);
 
 	let activeSceneIndex = $state(0);
 	let publishedCarousel = $derived(resolveProjectPreviewCarousel(project.id));
 	let publishedPreview = $derived(resolveProjectPreviewMedia(project.id));
 	let sceneCount = $derived(publishedCarousel?.scenes.length ?? 0);
 	let hasCarousel = $derived(Boolean(publishedCarousel && sceneCount > 0));
-	let normalizedSceneIndex = $derived(sceneCount > 0 && isActive ? activeSceneIndex % sceneCount : 0);
+	let normalizedSceneIndex = $derived(
+		sceneCount > 0 && isActive ? activeSceneIndex % sceneCount : 0
+	);
 	let currentScene = $derived(
 		hasCarousel && publishedCarousel
 			? (publishedCarousel.scenes[normalizedSceneIndex] ?? publishedCarousel.scenes[0] ?? null)
 			: null
 	);
 	let currentMobileSceneAspectRatio = $derived(
-		currentScene?.surface === 'mobile' ? currentScene.source?.aspectRatio ?? null : null
+		currentScene?.surface === 'mobile' ? (currentScene.source?.aspectRatio ?? null) : null
 	);
 	let shouldAnimateMedia = $derived(Boolean(isActive && !prefersReducedMotion.current));
 	let shouldAutoAdvance = $derived(
@@ -39,9 +41,12 @@
 	);
 
 	function queueSceneAdvance(durationInMs: number) {
-		return window.setTimeout(() => {
-			activeSceneIndex += 1;
-		}, Math.max(durationInMs, 1200));
+		return window.setTimeout(
+			() => {
+				activeSceneIndex += 1;
+			},
+			Math.max(durationInMs, 1200)
+		);
 	}
 
 	function syncPreviewVideo(shouldPlay: boolean) {

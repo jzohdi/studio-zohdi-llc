@@ -111,7 +111,7 @@ export const projectPreviewCarousel: Record<string, ProjectPreviewCarouselAsset>
 				id: 'textFrames-2',
 				kind: 'text',
 				label: 'Text Frame 03',
-				text: 'Recieve Email Alerts When New Requests Match Your Search',
+				text: 'Receive Email Alerts When New Requests Match Your Search',
 				fit: 'contain',
 				surface: 'text',
 				mediaType: 'text',

@@ -119,30 +119,30 @@ async function publishProjectCarousel(projectId, manifest) {
 
 	const collections = {
 		desktopScreenshots: (config.desktopScreenshots ?? []).map((asset, index) =>
-			buildResolvedScene('desktopScreenshots', index, asset, timings)
+			buildResolvedScene('desktopScreenshots', index, asset, timings, projectId)
 		),
 		desktopScreenRecordings: (config.desktopScreenRecordings ?? []).map((asset, index) =>
-			buildResolvedScene('desktopScreenRecordings', index, asset, timings)
+			buildResolvedScene('desktopScreenRecordings', index, asset, timings, projectId)
 		),
 		mobileScreenshots: (config.mobileScreenshots ?? []).map((asset, index) =>
-			buildResolvedScene('mobileScreenshots', index, asset, timings)
+			buildResolvedScene('mobileScreenshots', index, asset, timings, projectId)
 		),
 		mobileScreenRecordings: (config.mobileScreenRecordings ?? []).map((asset, index) =>
-			buildResolvedScene('mobileScreenRecordings', index, asset, timings)
+			buildResolvedScene('mobileScreenRecordings', index, asset, timings, projectId)
 		),
 		textFrames: (config.textFrames ?? config.textFrame ?? []).map((frame, index) =>
-			buildResolvedTextScene(index, frame)
+			buildResolvedTextScene(index, frame, projectId)
 		)
 	};
 
 	const timelineReferences =
 		config.timeline?.length > 0 ? config.timeline : buildAutoTimeline(collections);
-	const scenes = timelineReferences
-		.map((reference) => collections[reference.collection]?.[reference.index] ?? null)
-		.filter(Boolean);
+	const scenes = timelineReferences.map((reference, index) =>
+		resolveSceneReference(reference, collections, projectId, `timeline[${index}]`)
+	);
 	const mobilePosterReference = config.homepage?.mobilePoster ?? null;
 	const mobilePosterScene = mobilePosterReference
-		? (collections[mobilePosterReference.collection]?.[mobilePosterReference.index] ?? null)
+		? resolveSceneReference(mobilePosterReference, collections, projectId, 'homepage.mobilePoster')
 		: null;
 
 	if (scenes.length === 0 && !mobilePosterScene) {
@@ -194,17 +194,13 @@ async function publishProjectCarousel(projectId, manifest) {
 		});
 	}
 
-	const mobilePoster = mobilePosterScene?.path
-		? {
-				label: mobilePosterScene.label,
-				fit: mobilePosterScene.fit,
-				...(await copyProjectAsset({
-					normalizedPath: mobilePosterScene.path,
-					projectId,
-					carouselAssetsDir,
-					copiedAssets
-				}))
-			}
+	const mobilePoster = mobilePosterScene
+		? await exportMobilePoster({
+				projectId,
+				scene: mobilePosterScene,
+				carouselAssetsDir,
+				copiedAssets
+			})
 		: null;
 
 	console.info(`Published carousel assets to ${toWorkspaceRelativePath(carouselDir)}`);
@@ -269,39 +265,57 @@ async function writeGeneratedManifest(manifest) {
 	await writeFile(generatedManifestPath, manifestSource);
 }
 
-function buildResolvedScene(collection, index, input, defaults) {
+function buildResolvedScene(collection, index, input, defaults, projectId) {
 	const assetObject = toAssetObject(input);
 	const mediaType = getCollectionMediaType(collection);
+	const durationInSeconds =
+		assetObject.durationInSeconds ??
+		(mediaType === 'recording'
+			? defaults.recordingDurationInSeconds
+			: defaults.screenshotDurationInSeconds);
 
 	return {
 		id: `${collection}-${index}`,
 		kind: mediaType === 'recording' ? 'video' : 'image',
-		path: normalizeAssetPath(assetObject.path),
+		path: normalizeAssetPath(
+			assertNonEmptyString(
+				assetObject.path,
+				`${projectId}:${collection}[${index}] must define a string path`
+			)
+		),
 		label: createSceneLabel(collection, index, assetObject.label),
 		text: null,
 		surface: getCollectionSurface(collection),
 		mediaType,
-		fit: assetObject.fit ?? 'cover',
+		fit: normalizeFit(assetObject.fit, `${projectId}:${collection}[${index}]`),
 		durationInMs: toMilliseconds(
-			assetObject.durationInSeconds ??
-				(mediaType === 'recording'
-					? defaults.recordingDurationInSeconds
-					: defaults.screenshotDurationInSeconds)
+			assertPositiveNumber(
+				durationInSeconds,
+				`${projectId}:${collection}[${index}] must define a positive duration in seconds`
+			)
 		)
 	};
 }
 
-function buildResolvedTextScene(index, input) {
+function buildResolvedTextScene(index, input, projectId) {
 	return {
 		id: `textFrames-${index}`,
 		kind: 'text',
 		path: null,
 		label: createSceneLabel('textFrames', index),
-		text: input.text,
+		text: assertNonEmptyString(
+			typeof input?.text === 'string' ? input.text.trim() : input?.text,
+			`${projectId}:textFrames[${index}] must define non-empty text`
+		),
 		surface: 'text',
 		mediaType: 'text',
 		fit: 'contain',
-		durationInMs: toMilliseconds(input.duration)
+		durationInMs: toMilliseconds(
+			assertPositiveNumber(
+				input?.duration,
+				`${projectId}:textFrames[${index}] must define a positive duration`
+			)
+		)
 	};
 }
 
@@ -321,6 +335,36 @@ function buildAutoTimeline(collections) {
 	}
 
 	return references;
+}
+
+function resolveSceneReference(reference, collections, projectId, referenceLabel) {
+	if (!reference || typeof reference !== 'object') {
+		throw new Error(`${projectId}:${referenceLabel} must be an object with collection and index.`);
+	}
+
+	const { collection, index } = reference;
+
+	if (!collectionOrder.includes(collection)) {
+		throw new Error(
+			`${projectId}:${referenceLabel} references unsupported collection "${String(collection)}".`
+		);
+	}
+
+	if (!Number.isInteger(index) || index < 0) {
+		throw new Error(
+			`${projectId}:${referenceLabel} must use a non-negative integer index. Received "${String(index)}".`
+		);
+	}
+
+	const scene = collections[collection]?.[index] ?? null;
+
+	if (!scene) {
+		throw new Error(
+			`${projectId}:${referenceLabel} references missing scene ${collection}[${index}].`
+		);
+	}
+
+	return scene;
 }
 
 function normalizeAssetPath(value) {
@@ -358,8 +402,57 @@ function getCollectionMediaType(collection) {
 	return collection.includes('Recordings') ? 'recording' : 'screenshot';
 }
 
+function normalizeFit(value, contextLabel) {
+	if (value === undefined) {
+		return 'cover';
+	}
+
+	if (value === 'cover' || value === 'contain') {
+		return value;
+	}
+
+	throw new Error(
+		`${contextLabel} uses unsupported fit "${String(value)}". Expected "cover" or "contain".`
+	);
+}
+
 function toMilliseconds(seconds) {
 	return Math.max(1, Math.round(seconds * 1000));
+}
+
+async function exportMobilePoster({ projectId, scene, carouselAssetsDir, copiedAssets }) {
+	if (scene.surface !== 'mobile' || scene.kind !== 'image' || !scene.path) {
+		throw new Error(
+			`${projectId}:homepage.mobilePoster must reference a mobile screenshot scene with a file path.`
+		);
+	}
+
+	return {
+		label: scene.label,
+		fit: scene.fit,
+		...(await copyProjectAsset({
+			normalizedPath: scene.path,
+			projectId,
+			carouselAssetsDir,
+			copiedAssets
+		}))
+	};
+}
+
+function assertNonEmptyString(value, message) {
+	if (typeof value !== 'string' || value.trim() === '') {
+		throw new Error(message);
+	}
+
+	return value;
+}
+
+function assertPositiveNumber(value, message) {
+	if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+		throw new Error(message);
+	}
+
+	return value;
 }
 
 async function copyProjectAsset({ normalizedPath, projectId, carouselAssetsDir, copiedAssets }) {

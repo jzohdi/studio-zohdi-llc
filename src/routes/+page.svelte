@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { MediaQuery } from 'svelte/reactivity';
 	import ProjectDesktopPreview from '$lib/components/home/ProjectDesktopPreview.svelte';
 	import ProjectMobilePreview from '$lib/components/home/ProjectMobilePreview.svelte';
+	import { preloadProjectPreviewAssets } from '$lib/components/home/project-preview-assets';
 	import ThemeToggle from '$lib/components/home/ThemeToggle.svelte';
 	import { defaultFeaturedProjectId, featuredProjects } from '$lib/data/featured-projects';
 	import {
@@ -16,6 +18,7 @@
 	const projectCountLabel = featuredProjects.length.toString().padStart(2, '0');
 	const hoverTagOffsetX = 24;
 	const hoverTagOffsetY = 18;
+	const desktopShowcaseMediaQuery = new MediaQuery('(min-width: 901px)', false);
 
 	let theme = $state<ThemeName>('light');
 	let activeProjectId = $state(defaultFeaturedProjectId);
@@ -25,6 +28,23 @@
 	let activeProject = $derived(
 		featuredProjects.find((project) => project.id === activeProjectId) ?? fallbackProject
 	);
+
+	$effect(() => {
+		const isDesktopShowcaseActive = desktopShowcaseMediaQuery.current;
+		if (!isDesktopShowcaseActive) return;
+
+		for (const project of featuredProjects) {
+			preloadProjectPreviewAssets(project.id, 'first', 'low');
+		}
+	});
+
+	$effect(() => {
+		const isDesktopShowcaseActive = desktopShowcaseMediaQuery.current;
+		if (!isDesktopShowcaseActive) return;
+		const currentProjectId = activeProjectId;
+
+		preloadProjectPreviewAssets(currentProjectId, 'all', 'high');
+	});
 
 	onMount(() => {
 		const resolvedTheme = resolveTheme();
