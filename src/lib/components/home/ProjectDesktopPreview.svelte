@@ -36,9 +36,6 @@
 	let shouldAutoAdvance = $derived(
 		Boolean(shouldAnimateMedia && publishedCarousel && publishedCarousel.scenes.length > 1)
 	);
-	let videoUrlsAttribute = $derived(
-		publishedPreview ? publishedPreview.videoUrls.join(',') : undefined
-	);
 
 	function queueSceneAdvance(durationInMs: number) {
 		return window.setTimeout(
@@ -189,10 +186,6 @@
 		class="project-desktop-preview"
 		data-accent={project.accent}
 		data-active={isActive}
-		data-poster-url={publishedPreview.posterUrl}
-		data-video-urls={videoUrlsAttribute}
-		data-autoplay="true"
-		data-loop="true"
 		aria-hidden="true"
 	>
 		<div class="project-desktop-preview__glow"></div>
