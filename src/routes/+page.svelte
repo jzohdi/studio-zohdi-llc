@@ -283,7 +283,7 @@
 	}
 
 	.desktop-showcase {
-		--showcase-stage-width: clamp(23rem, 29vw, 28.25rem);
+		--showcase-stage-width: clamp(27rem, 35vw, 34rem);
 		--showcase-gap: clamp(1rem, 2.4vw, 1.9rem);
 
 		position: relative;

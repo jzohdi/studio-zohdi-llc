@@ -34,6 +34,12 @@
 				"durationInSeconds": 6,
 				"fit": "contain",
 				"label": "Instantly Find B7A Requests"
+			},
+			{
+				"path": "projects/foia-search/desktop_recording_2.mp4",
+				"durationInSeconds": 11,
+				"fit": "contain",
+				"label": "Lightning Fast Search API"
 			}
 		],
 		"mobileScreenshots": [
@@ -53,7 +59,7 @@
 		"mobileScreenRecordings": [
 			{
 				"path": "projects/foia-search/mobile_recording_1.mp4",
-				"durationInSeconds": 4.2,
+				"durationInSeconds": 6,
 				"fit": "contain"
 			}
 		],
@@ -64,25 +70,21 @@
 			},
 			{
 				"text": "Instantly Query All FOIA Requests",
-				"duration": 1.6
+				"duration": 2
 			},
 			{
 				"text": "Receive Email Alerts When New Requests Match Your Search",
-				"duration": 1.6
+				"duration": 2
+			},
+			{
+				"text": "Lightning Fast Search API",
+				"duration": 2
 			}
 		],
 		"timeline": [
 			{
 				"collection": "textFrames",
 				"index": 0
-			},
-			{
-				"collection": "mobileScreenshots",
-				"index": 0
-			},
-			{
-				"collection": "textFrames",
-				"index": 1
 			},
 			{
 				"collection": "desktopScreenRecordings",
@@ -95,6 +97,14 @@
 			{
 				"collection": "mobileScreenRecordings",
 				"index": 0
+			},
+			{
+				"collection": "textFrames",
+				"index": 3
+			},
+			{
+				"collection": "desktopScreenRecordings",
+				"index": 1
 			}
 		],
 		"homepage": {
