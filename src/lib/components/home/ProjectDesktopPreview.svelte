@@ -6,6 +6,7 @@
 		resolveProjectPreviewCarousel,
 		resolveProjectPreviewMedia
 	} from '$lib/components/home/project-preview-assets';
+	import { formatSceneCounter } from '$lib/components/home/preview-carousel';
 
 	interface Props {
 		project: FeaturedProject;
@@ -172,8 +173,7 @@
 							</div>
 
 							<span class="preview-carousel__count">
-								{(normalizedSceneIndex + 1).toString().padStart(2, '0')} /
-								{publishedCarousel.scenes.length.toString().padStart(2, '0')}
+								{formatSceneCounter(normalizedSceneIndex, publishedCarousel.scenes.length)}
 							</span>
 						</div>
 					{/if}

@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
+	import BrandBlock from '$lib/components/home/BrandBlock.svelte';
 	import ProjectDesktopPreview from '$lib/components/home/ProjectDesktopPreview.svelte';
 	import ProjectMobilePreview from '$lib/components/home/ProjectMobilePreview.svelte';
 	import { preloadProjectPreviewAssets } from '$lib/components/home/project-preview-assets';
-	import ThemeToggle from '$lib/components/home/ThemeToggle.svelte';
+	import Topbar from '$lib/components/home/Topbar.svelte';
 	import { defaultFeaturedProjectId, featuredProjects } from '$lib/data/featured-projects';
 	import {
 		applyTheme,
@@ -15,7 +16,6 @@
 	} from '$lib/utils/theme';
 
 	const fallbackProject = featuredProjects[0]!;
-	const projectCountLabel = featuredProjects.length.toString().padStart(2, '0');
 	const hoverTagOffsetX = 24;
 	const hoverTagOffsetY = 18;
 	const desktopShowcaseMediaQuery = new MediaQuery('(min-width: 901px)', false);
@@ -97,33 +97,11 @@
 </svelte:head>
 
 <div class="home-shell">
-	<header class="topbar container" aria-label="Top bar">
-		<div class="topbar__rule" aria-hidden="true"></div>
-
-		<div class="topbar__desktop">
-			<ThemeToggle {theme} onToggle={handleThemeToggle} />
-			<a
-				class="topbar__text-control topbar__text-control--cta"
-				href="mailto:jake@studio-zohdi-llc.com"
-			>
-				LET'S TALK!
-			</a>
-		</div>
-
-		<div class="topbar__mobile">
-			<ThemeToggle {theme} onToggle={handleThemeToggle} variant="compact" />
-		</div>
-	</header>
+	<Topbar {theme} onToggle={handleThemeToggle} />
 
 	<main class="container home-main">
 		<section class="home-hero" aria-labelledby="homepage-title">
-			<div class="brand-block">
-				<h1 id="homepage-title" class="brand-block__title">
-					<span>STUDIO</span>
-					<span>ZOHDI</span>
-				</h1>
-				<p class="brand-block__count eyebrow">RECENT PROJECTS ({projectCountLabel})</p>
-			</div>
+			<BrandBlock projectCount={featuredProjects.length} />
 
 			<section class="desktop-showcase" aria-labelledby="desktop-projects-heading">
 				<h2 id="desktop-projects-heading" class="sr-only">Featured projects</h2>
@@ -211,46 +189,6 @@
 		padding-block: var(--page-padding-block) clamp(1.75rem, 4vw, 3rem);
 	}
 
-	.topbar {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		padding-block: 0.35rem 1.15rem;
-	}
-
-	.topbar__rule {
-		flex: 1;
-		height: 1px;
-		background: linear-gradient(90deg, hsl(var(--foreground) / 0.16), transparent 72%);
-	}
-
-	.topbar__desktop,
-	.topbar__mobile {
-		display: flex;
-		align-items: center;
-		gap: clamp(0.9rem, 2vw, 1.5rem);
-	}
-
-	.topbar__mobile {
-		display: none;
-	}
-
-	.topbar__text-control {
-		display: inline-flex;
-		align-items: center;
-		font-family: var(--font-display);
-		font-size: 0.72rem;
-		font-weight: 500;
-		letter-spacing: 0.22em;
-		text-decoration: none;
-		text-transform: uppercase;
-		white-space: nowrap;
-	}
-
-	.topbar__text-control--cta {
-		color: hsl(var(--pink) / 0.74);
-	}
-
 	.home-main {
 		padding-bottom: clamp(1.5rem, 4vw, 3.25rem);
 	}
@@ -258,34 +196,6 @@
 	.home-hero {
 		display: grid;
 		gap: clamp(1.25rem, 3vw, 2rem);
-	}
-
-	.brand-block {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: flex-start;
-		justify-content: flex-start;
-		gap: 0.7rem 1.35rem;
-		padding-top: 0.2rem;
-	}
-
-	.brand-block__title {
-		display: grid;
-		gap: 0.18rem;
-		font-size: clamp(0.78rem, 1vw, 0.9rem);
-		font-weight: 600;
-		line-height: 0.92;
-		letter-spacing: 0.24em;
-		text-transform: uppercase;
-	}
-
-	.brand-block__count {
-		font-family: var(--font-display);
-		font-size: clamp(0.72rem, 1vw, 0.82rem);
-		font-weight: 500;
-		letter-spacing: 0.22em;
-		color: hsl(var(--muted-foreground));
-		text-transform: uppercase;
 	}
 
 	.desktop-showcase {
@@ -466,20 +376,8 @@
 	}
 
 	@media (max-width: 900px) {
-		.topbar {
-			padding-bottom: 1rem;
-		}
-
-		.topbar__rule,
-		.topbar__desktop,
 		.desktop-showcase {
 			display: none;
-		}
-
-		.topbar__mobile {
-			display: flex;
-			width: 100%;
-			justify-content: flex-end;
 		}
 
 		.mobile-showcase {
