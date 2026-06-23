@@ -12,19 +12,24 @@
 		toggleTheme,
 		type ThemeName
 	} from '$lib/utils/theme';
+	import { runAfterInitialPaint } from '$lib/utils/after-paint';
 
 	interface Props {
 		project: ProjectPage;
 	}
 
 	const projectInfoLabel = 'Project infos';
-	const infoLabelStartDelayMs = 80;
+	const titleIntroDelayMs = 160;
+	const topbarIntroStaggerMs = 110;
+	const infoLabelStartDelayMs = 280;
 	const infoLabelWordStaggerMs = 150;
 	const infoLabelWordDurationMs = 500;
 	const infoParagraphWordStaggerMs = 96;
 	const infoParagraphWordDurationMs = 620;
 	const infoBlockGapMs = 130;
+	const ctaIntroGapMs = 140;
 
+	let introStarted = $state(false);
 	let theme = $state<ThemeName>('light');
 	let { project }: Props = $props();
 
@@ -45,19 +50,41 @@
 		return project.infoParagraphs.map((paragraph) => {
 			const currentDelay = nextDelay;
 			nextDelay +=
-				estimateRevealDuration(
-					paragraph,
-					infoParagraphWordStaggerMs,
-					infoParagraphWordDurationMs
-				) + infoBlockGapMs;
+				estimateRevealDuration(paragraph, infoParagraphWordStaggerMs, infoParagraphWordDurationMs) +
+				infoBlockGapMs;
 			return currentDelay;
 		});
+	});
+
+	let introActive = $derived(introStarted);
+	let ctaIntroDelayMs = $derived.by(() => {
+		const lastParagraph = project.infoParagraphs[project.infoParagraphs.length - 1] ?? '';
+		const lastParagraphDelay =
+			infoParagraphStartDelays[project.infoParagraphs.length - 1] ?? infoLabelStartDelayMs;
+
+		return (
+			lastParagraphDelay +
+			estimateRevealDuration(
+				lastParagraph,
+				infoParagraphWordStaggerMs,
+				infoParagraphWordDurationMs
+			) +
+			ctaIntroGapMs
+		);
 	});
 
 	onMount(() => {
 		const resolvedTheme = resolveTheme();
 		theme = resolvedTheme;
 		applyTheme(resolvedTheme);
+
+		const cancelIntro = runAfterInitialPaint(() => {
+			introStarted = true;
+		});
+
+		return () => {
+			cancelIntro();
+		};
 	});
 
 	function handleThemeToggle() {
@@ -74,17 +101,29 @@
 
 <main class="project-detail" data-accent={project.accent}>
 	<div class="container project-detail__container">
-		<ProjectPageTopbar {theme} onToggle={handleThemeToggle} />
+		<ProjectPageTopbar
+			{theme}
+			onToggle={handleThemeToggle}
+			{introActive}
+			introStaggerMs={topbarIntroStaggerMs}
+		/>
 
 		<section class="project-detail__intro" aria-labelledby="project-detail-title">
 			<div class="project-detail__masthead">
-				<ProjectTitleHoverEffect id="project-detail-title" lines={project.nameLines} />
+				<div
+					class="project-detail__title-reveal"
+					data-intro={introActive ? 'active' : 'pending'}
+					style:--project-detail-intro-delay={`${titleIntroDelayMs}ms`}
+				>
+					<ProjectTitleHoverEffect id="project-detail-title" lines={project.nameLines} />
+				</div>
 			</div>
 
 			<div class="project-detail__info-grid">
 				<p class="project-detail__info-label eyebrow">
 					<TextGenerateReveal
 						text={projectInfoLabel}
+						active={introActive}
 						startDelayMs={infoLabelStartDelayMs}
 						wordStaggerMs={infoLabelWordStaggerMs}
 						wordDurationMs={infoLabelWordDurationMs}
@@ -96,6 +135,7 @@
 						<p>
 							<TextGenerateReveal
 								text={paragraph}
+								active={introActive}
 								startDelayMs={infoParagraphStartDelays[index] ?? infoLabelStartDelayMs}
 								wordStaggerMs={infoParagraphWordStaggerMs}
 								wordDurationMs={infoParagraphWordDurationMs}
@@ -103,29 +143,35 @@
 						</p>
 					{/each}
 
-					{#if project.website}
-						<a
-							class="project-detail__cta eyebrow"
-							href={project.website}
-							target="_blank"
-							rel="noreferrer noopener"
-						>
-							{project.websiteLabel}
-							<span aria-hidden="true">→</span>
-						</a>
-					{:else}
-						<span
-							class="project-detail__cta project-detail__cta--disabled eyebrow"
-							aria-disabled="true"
-						>
-							{project.websiteLabel}
-						</span>
-					{/if}
+					<div
+						class="project-detail__cta-wrap"
+						data-intro={introActive ? 'active' : 'pending'}
+						style:--project-detail-intro-delay={`${ctaIntroDelayMs}ms`}
+					>
+						{#if project.website}
+							<a
+								class="project-detail__cta eyebrow"
+								href={project.website}
+								target="_blank"
+								rel="noreferrer noopener"
+							>
+								{project.websiteLabel}
+								<span aria-hidden="true">→</span>
+							</a>
+						{:else}
+							<span
+								class="project-detail__cta project-detail__cta--disabled eyebrow"
+								aria-disabled="true"
+							>
+								{project.websiteLabel}
+							</span>
+						{/if}
+					</div>
 				</div>
 			</div>
 		</section>
 
-		<ProjectMediaBento {project} />
+		<ProjectMediaBento {project} revealReady={introActive} />
 	</div>
 </main>
 
@@ -195,6 +241,48 @@
 
 	.project-detail__masthead {
 		display: block;
+	}
+
+	.project-detail__title-reveal,
+	.project-detail__cta-wrap {
+		opacity: 1;
+		filter: none;
+		will-change: opacity, transform, filter;
+		transition:
+			opacity 860ms cubic-bezier(0.22, 1, 0.36, 1),
+			transform 960ms cubic-bezier(0.22, 1, 0.36, 1),
+			filter 820ms ease;
+		transition-delay: var(--project-detail-intro-delay, 0ms);
+	}
+
+	.project-detail__title-reveal {
+		display: inline-block;
+		max-width: 100%;
+		transform-origin: 0 100%;
+	}
+
+	.project-detail__cta-wrap {
+		width: fit-content;
+		transform-origin: 0 50%;
+	}
+
+	:global(html[data-js='true']) .project-detail__title-reveal[data-intro='pending'] {
+		opacity: 0;
+		filter: blur(0.62rem);
+		transform: translate3d(0, 2.4rem, 0) scale(0.985);
+	}
+
+	:global(html[data-js='true']) .project-detail__cta-wrap[data-intro='pending'] {
+		opacity: 0;
+		filter: blur(0.28rem);
+		transform: translate3d(0, 1rem, 0);
+	}
+
+	:global(html[data-js='true']) .project-detail__title-reveal[data-intro='active'],
+	:global(html[data-js='true']) .project-detail__cta-wrap[data-intro='active'] {
+		opacity: 1;
+		filter: none;
+		transform: none;
 	}
 
 	.project-detail__info-grid {
@@ -267,8 +355,17 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.project-detail__title-reveal,
+		.project-detail__cta-wrap,
 		.project-detail__cta {
 			transition: none;
+		}
+
+		:global(html[data-js='true']) .project-detail__title-reveal[data-intro='pending'],
+		:global(html[data-js='true']) .project-detail__cta-wrap[data-intro='pending'] {
+			opacity: 1;
+			filter: none;
+			transform: none;
 		}
 	}
 </style>

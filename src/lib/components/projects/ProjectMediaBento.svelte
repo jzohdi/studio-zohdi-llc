@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
 	import type { ProjectPage } from '$lib/data/project-pages';
 	import ProjectMediaTile from '$lib/components/projects/ProjectMediaTile.svelte';
 	import {
@@ -8,9 +9,15 @@
 
 	interface Props {
 		project: ProjectPage;
+		revealReady?: boolean;
 	}
 
-	let { project }: Props = $props();
+	const revealedItemIds = new SvelteSet<string>();
+	const revealDelayStepMs = 90;
+	const revealThreshold = 0.14;
+	const revealRootMargin = '0px 0px -12% 0px';
+
+	let { project, revealReady = true }: Props = $props();
 
 	let mediaItems = $derived(getProjectMediaItems(project.id));
 
@@ -29,6 +36,35 @@
 
 		return classNames.join(' ');
 	}
+
+	function observeReveal(itemId: string) {
+		return (element: HTMLDivElement) => {
+			if (revealedItemIds.has(itemId) || typeof IntersectionObserver === 'undefined') {
+				revealedItemIds.add(itemId);
+				return;
+			}
+
+			const observer = new IntersectionObserver(
+				(entries) => {
+					if (!entries.some((entry) => entry.isIntersecting)) {
+						return;
+					}
+
+					revealedItemIds.add(itemId);
+				},
+				{
+					threshold: revealThreshold,
+					rootMargin: revealRootMargin
+				}
+			);
+
+			observer.observe(element);
+
+			return () => {
+				observer.disconnect();
+			};
+		};
+	}
 </script>
 
 {#if mediaItems.length > 0}
@@ -37,8 +73,13 @@
 
 		<div class="project-media-bento__grid">
 			{#each mediaItems as item, index (item.id)}
-				<div class={getTileClass(item, index)}>
-					<ProjectMediaTile {item} accent={project.accent} isHero={index === 0} />
+				{@const revealed = revealedItemIds.has(item.id)}
+				<div
+					class={getTileClass(item, index)}
+					style:--project-media-reveal-delay={`${Math.min(index, 5) * revealDelayStepMs}ms`}
+					{@attach revealReady && observeReveal(item.id)}
+				>
+					<ProjectMediaTile {item} accent={project.accent} isHero={index === 0} {revealed} />
 				</div>
 			{/each}
 		</div>

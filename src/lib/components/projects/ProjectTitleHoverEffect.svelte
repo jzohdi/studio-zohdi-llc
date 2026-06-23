@@ -4,7 +4,6 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Action } from 'svelte/action';
 
 	interface Props {
 		id?: string;
@@ -33,11 +32,13 @@
 	let fontFamily = $state('var(--font-display)');
 	let letterSpacingPx = $state(0);
 	let strokeWidthPx = $state(1.6);
+	let overlayPaddingX = $state(0);
+	let overlayPaddingY = $state(0);
 	let lineMetrics = $state<TitleLineMetric[]>([]);
-	let maskTargetX = $state(50);
-	let maskTargetY = $state(50);
-	let maskX = $state(50);
-	let maskY = $state(50);
+	let maskTargetX = $state(0);
+	let maskTargetY = $state(0);
+	let maskX = $state(0);
+	let maskY = $state(0);
 
 	let maskAnimationFrameId: number | null = null;
 	let lastMaskFrameTime = 0;
@@ -47,6 +48,8 @@
 	const revealGradientId = `project-title-reveal-${instanceId}`;
 	const accessibleTitle = $derived(lines.join(' '));
 	const maskRadius = $derived(Math.max(svgWidth, svgHeight) * 0.34);
+	const defaultMaskX = $derived(overlayPaddingX + (svgWidth - overlayPaddingX * 2) / 2);
+	const defaultMaskY = $derived(overlayPaddingY + (svgHeight - overlayPaddingY * 2) / 2);
 	const hasOverlay = $derived(
 		svgWidth > 0 && svgHeight > 0 && lineMetrics.length > 0 && fontSizePx > 0
 	);
@@ -67,23 +70,40 @@
 		const parsedFontSize = Number.parseFloat(titleStyles.fontSize);
 		const parsedLetterSpacing = Number.parseFloat(titleStyles.letterSpacing);
 		const resolvedFontSize = Number.isFinite(parsedFontSize) ? parsedFontSize : 0;
+		const nextStrokeWidth = Math.max(1.6, resolvedFontSize * 0.028);
+		const nextOverlayPaddingX = Math.ceil(Math.max(nextStrokeWidth * 3.2, resolvedFontSize * 0.06));
+		const nextOverlayPaddingY = Math.ceil(Math.max(nextStrokeWidth * 2.2, resolvedFontSize * 0.09));
 
-		svgWidth = wrapperRect.width;
-		svgHeight = wrapperRect.height;
+		svgWidth = Math.ceil(wrapperRect.width + nextOverlayPaddingX * 2);
+		svgHeight = Math.ceil(wrapperRect.height + nextOverlayPaddingY * 2);
 		fontSizePx = resolvedFontSize;
 		fontWeight = titleStyles.fontWeight;
 		fontFamily = titleStyles.fontFamily;
 		letterSpacingPx = Number.isFinite(parsedLetterSpacing) ? parsedLetterSpacing : 0;
-		strokeWidthPx = Math.max(1.6, resolvedFontSize * 0.028);
+		strokeWidthPx = nextStrokeWidth;
+		overlayPaddingX = nextOverlayPaddingX;
+		overlayPaddingY = nextOverlayPaddingY;
 		lineMetrics = [...lineNodes].map((node) => {
 			const lineRect = node.getBoundingClientRect();
 
 			return {
 				text: node.dataset.projectTitleLine ?? node.textContent ?? '',
-				x: lineRect.left - wrapperRect.left,
-				y: lineRect.top - wrapperRect.top + lineRect.height / 2 + resolvedFontSize * 0.12
+				x: lineRect.left - wrapperRect.left + nextOverlayPaddingX,
+				y:
+					lineRect.top -
+					wrapperRect.top +
+					lineRect.height / 2 +
+					resolvedFontSize * 0.12 +
+					nextOverlayPaddingY
 			};
 		});
+
+		if (!hovered) {
+			maskTargetX = nextOverlayPaddingX + wrapperRect.width / 2;
+			maskTargetY = nextOverlayPaddingY + wrapperRect.height / 2;
+			maskX = maskTargetX;
+			maskY = maskTargetY;
+		}
 	}
 
 	function animateMask(timestamp: number) {
@@ -137,40 +157,36 @@
 		}
 
 		const rect = rootEl.getBoundingClientRect();
-		const nextX = ((event.clientX - rect.left) / rect.width) * 100;
-		const nextY = ((event.clientY - rect.top) / rect.height) * 100;
+		const nextX = event.clientX - rect.left + overlayPaddingX;
+		const nextY = event.clientY - rect.top + overlayPaddingY;
 
-		setMaskTarget(Math.min(100, Math.max(0, nextX)), Math.min(100, Math.max(0, nextY)));
+		setMaskTarget(Math.min(svgWidth, Math.max(0, nextX)), Math.min(svgHeight, Math.max(0, nextY)));
 	}
 
 	function handlePointerLeave() {
 		hovered = false;
-		setMaskTarget(50, 50);
+		setMaskTarget(defaultMaskX, defaultMaskY);
 	}
 
-	const useRootElement: Action<HTMLDivElement> = (node) => {
+	function useRootElement(node: HTMLDivElement) {
 		rootEl = node;
 
-		return {
-			destroy() {
-				if (rootEl === node) {
-					rootEl = null;
-				}
+		return () => {
+			if (rootEl === node) {
+				rootEl = null;
 			}
 		};
-	};
+	}
 
-	const useTitleElement: Action<HTMLHeadingElement> = (node) => {
+	function useTitleElement(node: HTMLHeadingElement) {
 		titleEl = node;
 
-		return {
-			destroy() {
-				if (titleEl === node) {
-					titleEl = null;
-				}
+		return () => {
+			if (titleEl === node) {
+				titleEl = null;
 			}
 		};
-	};
+	}
 
 	onMount(() => {
 		measureTitle();
@@ -201,14 +217,14 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	use:useRootElement
+	{@attach useRootElement}
 	class="project-title-hover"
 	data-hovered={hovered ? 'true' : 'false'}
 	onpointerenter={handlePointerEnter}
 	onpointermove={handlePointerMove}
 	onpointerleave={handlePointerLeave}
 >
-	<h1 use:useTitleElement {id} class="project-title-hover__base" aria-label={accessibleTitle}>
+	<h1 {@attach useTitleElement} {id} class="project-title-hover__base" aria-label={accessibleTitle}>
 		{#each lines as line (line)}
 			<span class="project-title-hover__line" data-project-title-line={line}>{line}</span>
 		{/each}
@@ -220,6 +236,8 @@
 			viewBox={`0 0 ${svgWidth} ${svgHeight}`}
 			width={svgWidth}
 			height={svgHeight}
+			style:left={`${-overlayPaddingX}px`}
+			style:top={`${-overlayPaddingY}px`}
 			aria-hidden="true"
 			xmlns="http://www.w3.org/2000/svg"
 		>
@@ -235,8 +253,8 @@
 				<radialGradient
 					id={revealGradientId}
 					gradientUnits="userSpaceOnUse"
-					cx={(maskX / 100) * svgWidth}
-					cy={(maskY / 100) * svgHeight}
+					cx={maskX}
+					cy={maskY}
 					r={maskRadius}
 				>
 					<stop offset="0%" stop-color="white" />
@@ -245,7 +263,13 @@
 				</radialGradient>
 
 				<mask id={maskId}>
-					<rect x="0" y="0" width="100%" height="100%" fill={`url(#${revealGradientId})`} />
+					<rect
+						x="0"
+						y="0"
+						width={svgWidth}
+						height={svgHeight}
+						fill={`url(#${revealGradientId})`}
+					/>
 				</mask>
 			</defs>
 
@@ -341,7 +365,6 @@
 
 	.project-title-hover__overlay {
 		position: absolute;
-		inset: 0;
 		pointer-events: none;
 		overflow: visible;
 	}

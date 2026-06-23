@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
 	interface Props {
 		text: string;
+		active?: boolean;
 		startDelayMs?: number;
 		wordStaggerMs?: number;
 		wordDurationMs?: number;
@@ -11,24 +10,15 @@
 
 	let {
 		text,
+		active = true,
 		startDelayMs = 0,
 		wordStaggerMs = 36,
 		wordDurationMs = 580,
 		filter = true
 	}: Props = $props();
 
-	let state = $state<'pending' | 'active'>('pending');
+	let state = $derived<'pending' | 'active'>(active ? 'active' : 'pending');
 	let words = $derived(text.trim().split(/\s+/).filter(Boolean));
-
-	onMount(() => {
-		const frameId = window.requestAnimationFrame(() => {
-			state = 'active';
-		});
-
-		return () => {
-			window.cancelAnimationFrame(frameId);
-		};
-	});
 </script>
 
 <span
@@ -70,19 +60,25 @@
 		margin-inline-end: 0.26em;
 	}
 
-	:global(html[data-js='true']) .text-generate-reveal[data-state='pending'] .text-generate-reveal__word,
-	:global(html[data-js='true']) .text-generate-reveal[data-state='active'] .text-generate-reveal__word {
+	:global(html[data-js='true'])
+		.text-generate-reveal[data-state='pending']
+		.text-generate-reveal__word,
+	:global(html[data-js='true'])
+		.text-generate-reveal[data-state='active']
+		.text-generate-reveal__word {
 		opacity: var(--text-generate-initial-opacity);
 		filter: blur(var(--text-generate-initial-blur));
 		transform: translate3d(var(--text-generate-initial-offset), 0, 0);
 	}
 
-	:global(html[data-js='true']) .text-generate-reveal[data-state='active'] .text-generate-reveal__word {
+	:global(html[data-js='true'])
+		.text-generate-reveal[data-state='active']
+		.text-generate-reveal__word {
 		animation: text-generate-reveal-word var(--text-generate-word-duration)
 			cubic-bezier(0.19, 1, 0.22, 1) both;
 		animation-delay: calc(
 			var(--text-generate-start-delay) +
-			(var(--text-generate-word-index) * var(--text-generate-word-stagger))
+				(var(--text-generate-word-index) * var(--text-generate-word-stagger))
 		);
 	}
 
