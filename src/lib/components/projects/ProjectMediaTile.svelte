@@ -2,6 +2,8 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import type { ProjectAccent } from '$lib/data/featured-projects';
 	import type { ProjectMediaItem } from '$lib/components/projects/project-media';
+	import MacbookFrame from '$lib/components/projects/devices/MacbookFrame.svelte';
+	import PhoneFrame from '$lib/components/projects/devices/PhoneFrame.svelte';
 
 	interface Props {
 		item: ProjectMediaItem;
@@ -10,14 +12,30 @@
 		revealed?: boolean;
 	}
 
+	const desktopScreenAspectRatio = 16 / 10;
+	const mobileScreenAspectRatio = 9 / 19.5;
+
 	let { item, accent, isHero = false, revealed = true }: Props = $props();
 
 	const prefersReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)', true);
 
 	let itemTitleId = $derived(`project-media-${item.id}`);
 	let shouldAnimate = $derived(item.kind === 'video' && revealed && !prefersReducedMotion.current);
+	let isMobileSurface = $derived(item.surface === 'mobile');
+	let screenAspectRatio = $derived(
+		item.source?.aspectRatio ??
+			(isMobileSurface ? mobileScreenAspectRatio : desktopScreenAspectRatio)
+	);
 	let mediaEyebrow = $derived(
-		item.kind === 'text' ? 'Callout' : item.surface === 'mobile' ? 'Mobile view' : 'Product view'
+		item.kind === 'text'
+			? 'Callout'
+			: isMobileSurface
+				? item.mediaType === 'recording'
+					? 'Mobile demo'
+					: 'Mobile view'
+				: item.mediaType === 'recording'
+					? 'Live demo'
+					: 'Desktop view'
 	);
 
 	function syncMediaPlayback(shouldPlay: boolean) {
@@ -42,55 +60,81 @@
 	}
 </script>
 
+{#snippet mediaContent()}
+	{#if item.kind === 'video' && item.sourceUrl}
+		{#key `${item.id}-${shouldAnimate}`}
+			<video
+				class="project-media-tile__media"
+				autoplay={shouldAnimate}
+				loop={shouldAnimate}
+				muted
+				playsinline
+				preload={isHero && shouldAnimate ? 'auto' : 'metadata'}
+				aria-hidden="true"
+				{@attach syncMediaPlayback(shouldAnimate)}
+			>
+				<source src={item.sourceUrl} type={item.source?.type ?? 'video/mp4'} />
+			</video>
+		{/key}
+	{:else if item.sourceUrl}
+		<img
+			class="project-media-tile__media"
+			src={item.sourceUrl}
+			alt=""
+			aria-hidden="true"
+			decoding="async"
+			draggable="false"
+			loading={isHero ? 'eager' : 'lazy'}
+			width={item.source?.width ?? undefined}
+			height={item.source?.height ?? undefined}
+		/>
+	{/if}
+{/snippet}
+
 <article
 	class="project-media-tile"
 	data-accent={accent}
-	data-hero={isHero ? 'true' : 'false'}
+	data-span={item.span}
 	data-kind={item.kind}
 	data-revealed={revealed ? 'true' : 'false'}
 	data-surface={item.surface}
-	aria-labelledby={itemTitleId}
+	aria-labelledby={item.kind === 'text' ? itemTitleId : undefined}
+	aria-label={item.kind !== 'text' && item.label ? item.label : undefined}
 >
 	<div class="project-media-tile__frame">
-		<div class="project-media-tile__meta">
-			<p class="project-media-tile__eyebrow eyebrow">{mediaEyebrow}</p>
-			<h3 class="project-media-tile__title" id={itemTitleId}>{item.label}</h3>
-		</div>
-
 		{#if item.kind === 'text' && item.text}
+			<div class="project-media-tile__meta">
+				<p class="project-media-tile__eyebrow eyebrow">{mediaEyebrow}</p>
+				<h3 class="project-media-tile__title" id={itemTitleId}>{item.label}</h3>
+			</div>
 			<div class="project-media-tile__text">
 				<p>{item.text}</p>
 			</div>
-		{:else if item.kind === 'video' && item.sourceUrl}
-			<div class="project-media-tile__visual" data-fit={item.fit}>
-				{#key `${item.id}-${shouldAnimate}`}
-					<video
-						class="project-media-tile__media"
-						autoplay={shouldAnimate}
-						loop={shouldAnimate}
-						muted
-						playsinline
-						preload={isHero && shouldAnimate ? 'auto' : 'metadata'}
-						aria-hidden="true"
-						{@attach syncMediaPlayback(shouldAnimate)}
-					>
-						<source src={item.sourceUrl} type={item.source?.type ?? 'video/mp4'} />
-					</video>
-				{/key}
-			</div>
-		{:else if item.sourceUrl}
-			<div class="project-media-tile__visual" data-fit={item.fit}>
+		{:else if item.kind === 'logo' && item.sourceUrl}
+			<div class="project-media-tile__logo-stage">
 				<img
-					class="project-media-tile__media"
+					class="project-media-tile__logo"
 					src={item.sourceUrl}
 					alt=""
 					aria-hidden="true"
 					decoding="async"
 					draggable="false"
 					loading={isHero ? 'eager' : 'lazy'}
-					width={item.source?.width ?? undefined}
-					height={item.source?.height ?? undefined}
 				/>
+			</div>
+		{:else if item.sourceUrl}
+			<div class="project-media-tile__stage" data-surface={item.surface}>
+				<div class="project-media-tile__device" data-surface={item.surface}>
+					{#if isMobileSurface}
+						<PhoneFrame {screenAspectRatio}>
+							{@render mediaContent()}
+						</PhoneFrame>
+					{:else}
+						<MacbookFrame {screenAspectRatio}>
+							{@render mediaContent()}
+						</MacbookFrame>
+					{/if}
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -166,19 +210,15 @@
 		gap: 1rem;
 		height: 100%;
 		padding: clamp(1rem, 2vw, 1.35rem);
-		border: 1px solid var(--tile-border);
-		border-radius: clamp(1.35rem, 2.5vw, 1.8rem);
+		border-radius: 4px;
 		background:
 			linear-gradient(155deg, var(--tile-shell-start), var(--tile-shell-end)),
 			radial-gradient(circle at top, rgb(255 255 255 / 0.24), transparent 52%);
 		box-shadow:
 			var(--shadow-card),
 			0 24px 70px var(--tile-glow);
-		overflow: hidden;
 		isolation: isolate;
-		transition:
-			box-shadow 920ms cubic-bezier(0.22, 1, 0.36, 1),
-			border-color 920ms cubic-bezier(0.22, 1, 0.36, 1);
+		transition: box-shadow 920ms cubic-bezier(0.22, 1, 0.36, 1);
 		transition-delay: var(--project-media-reveal-delay, 0ms);
 	}
 
@@ -214,16 +254,12 @@
 		letter-spacing: -0.03em;
 	}
 
-	.project-media-tile__visual {
+	.project-media-tile__stage,
+	.project-media-tile__logo-stage {
 		position: relative;
-		border-radius: clamp(1rem, 1.8vw, 1.35rem);
-		overflow: hidden;
-		background:
-			linear-gradient(160deg, var(--tile-surface-start), var(--tile-surface-end)),
-			radial-gradient(circle at top, rgb(255 255 255 / 0.26), transparent 50%);
-		box-shadow:
-			inset 0 0 0 1px rgb(255 255 255 / 0.26),
-			inset 0 1px 0 rgb(255 255 255 / 0.36);
+		display: grid;
+		place-items: center;
+		padding: clamp(1.25rem, 3.4vw, 3rem);
 		transition:
 			opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
 			transform 980ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -231,16 +267,44 @@
 		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 100ms);
 	}
 
-	.project-media-tile[data-hero='true'] .project-media-tile__visual {
-		min-height: clamp(22rem, 54vw, 42rem);
+	.project-media-tile[data-span='full'] .project-media-tile__stage {
+		padding: clamp(1.6rem, 5vw, 4.5rem);
 	}
 
-	.project-media-tile[data-surface='desktop'][data-hero='false'] .project-media-tile__visual {
-		min-height: clamp(14rem, 28vw, 20rem);
+	.project-media-tile__stage[data-surface='mobile'] {
+		padding-block: clamp(1.5rem, 3.6vw, 2.75rem);
 	}
 
-	.project-media-tile[data-surface='mobile'][data-hero='false'] .project-media-tile__visual {
-		aspect-ratio: 0.66;
+	.project-media-tile__device {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 120ms);
+	}
+
+	.project-media-tile__device[data-surface='mobile'] {
+		width: min(56%, 12.5rem);
+	}
+
+	.project-media-tile[data-span='full'] .project-media-tile__device[data-surface='mobile'] {
+		width: min(38%, 16rem);
+	}
+
+	.project-media-tile:hover .project-media-tile__device {
+		transform: translateY(-0.5rem);
+	}
+
+	.project-media-tile__logo {
+		width: min(46%, 11rem);
+		height: auto;
+		filter: drop-shadow(0 14px 26px rgb(15 23 42 / 0.18));
+		transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 120ms);
+	}
+
+	.project-media-tile:hover .project-media-tile__logo {
+		transform: translateY(-0.4rem) scale(1.02);
 	}
 
 	.project-media-tile[data-kind='text'] .project-media-tile__frame {
@@ -276,19 +340,10 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		object-position: top center;
 		background: linear-gradient(180deg, rgb(227 233 242), rgb(242 245 248));
 		transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
 		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 80ms);
-	}
-
-	.project-media-tile__visual[data-fit='contain'] .project-media-tile__media {
-		object-fit: contain;
-	}
-
-	.project-media-tile[data-surface='mobile']
-		.project-media-tile__visual[data-fit='contain']
-		.project-media-tile__media {
-		object-position: top center;
 	}
 
 	:global(html[data-js='true']) .project-media-tile[data-revealed='false'] {
@@ -320,7 +375,10 @@
 
 	:global(html[data-js='true'])
 		.project-media-tile[data-revealed='false']
-		.project-media-tile__visual,
+		.project-media-tile__stage,
+	:global(html[data-js='true'])
+		.project-media-tile[data-revealed='false']
+		.project-media-tile__logo-stage,
 	:global(html[data-js='true'])
 		.project-media-tile[data-revealed='false']
 		.project-media-tile__text {
@@ -336,16 +394,23 @@
 	}
 
 	@media (max-width: 720px) {
-		.project-media-tile[data-hero='true'] .project-media-tile__visual {
-			min-height: clamp(17rem, 72vw, 25rem);
+		.project-media-tile__device[data-surface='mobile'],
+		.project-media-tile[data-span='full'] .project-media-tile__device[data-surface='mobile'] {
+			width: min(66%, 16rem);
 		}
 
-		.project-media-tile[data-surface='desktop'][data-hero='false'] .project-media-tile__visual {
-			min-height: clamp(12.5rem, 56vw, 18rem);
+		.project-media-tile__logo {
+			width: min(40%, 9rem);
 		}
 
 		.project-media-tile__text p {
 			max-width: 13ch;
+		}
+	}
+
+	@media (hover: none) {
+		.project-media-tile:hover .project-media-tile__device {
+			transform: none;
 		}
 	}
 
@@ -354,7 +419,10 @@
 		.project-media-tile__frame,
 		.project-media-tile__frame::before,
 		.project-media-tile__meta,
-		.project-media-tile__visual,
+		.project-media-tile__stage,
+		.project-media-tile__logo-stage,
+		.project-media-tile__logo,
+		.project-media-tile__device,
 		.project-media-tile__text,
 		.project-media-tile__media {
 			transition: none;
@@ -385,7 +453,13 @@
 			.project-media-tile__meta,
 		:global(html[data-js='true'])
 			.project-media-tile[data-revealed='false']
-			.project-media-tile__visual,
+			.project-media-tile__stage,
+		:global(html[data-js='true'])
+			.project-media-tile[data-revealed='false']
+			.project-media-tile__logo-stage,
+		:global(html[data-js='true'])
+			.project-media-tile[data-revealed='false']
+			.project-media-tile__device,
 		:global(html[data-js='true'])
 			.project-media-tile[data-revealed='false']
 			.project-media-tile__text,

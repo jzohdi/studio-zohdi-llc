@@ -2,10 +2,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { ProjectPage } from '$lib/data/project-pages';
 	import ProjectMediaTile from '$lib/components/projects/ProjectMediaTile.svelte';
-	import {
-		getProjectMediaItems,
-		type ProjectMediaItem
-	} from '$lib/components/projects/project-media';
+	import { getProjectMediaItems } from '$lib/components/projects/project-media';
 
 	interface Props {
 		project: ProjectPage;
@@ -21,21 +18,33 @@
 
 	let mediaItems = $derived(getProjectMediaItems(project.id));
 
-	function getTileClass(item: ProjectMediaItem, index: number) {
-		const classNames = ['project-media-bento__cell'];
+	// Simulate left-to-right grid flow so a lone half-width tile (one with no
+	// partner before a full-width tile or the end) is centered instead of leaving
+	// a ragged gap. Full-width tiles always occupy their own row.
+	let tileLayoutClasses = $derived.by<string[]>(() => {
+		let rowColumn = 0;
 
-		if (index === 0) {
-			classNames.push('is-hero');
-		} else if (item.kind === 'text') {
-			classNames.push('is-text');
-		} else if (item.surface === 'mobile') {
-			classNames.push('is-mobile');
-		} else {
-			classNames.push('is-wide');
-		}
+		return mediaItems.map((item, index) => {
+			if (item.span === 'full') {
+				rowColumn = 0;
+				return 'is-full';
+			}
 
-		return classNames.join(' ');
-	}
+			if (rowColumn === 0) {
+				const nextItem = mediaItems[index + 1];
+
+				if (!nextItem || nextItem.span === 'full') {
+					return 'is-half is-centered';
+				}
+
+				rowColumn = 6;
+				return 'is-half';
+			}
+
+			rowColumn = 0;
+			return 'is-half';
+		});
+	});
 
 	function observeReveal(itemId: string) {
 		return (element: HTMLDivElement) => {
@@ -75,7 +84,7 @@
 			{#each mediaItems as item, index (item.id)}
 				{@const revealed = revealedItemIds.has(item.id)}
 				<div
-					class={getTileClass(item, index)}
+					class={`project-media-bento__cell ${tileLayoutClasses[index]}`}
 					style:--project-media-reveal-delay={`${Math.min(index, 5) * revealDelayStepMs}ms`}
 					{@attach revealReady && observeReveal(item.id)}
 				>
@@ -90,6 +99,8 @@
 	.project-media-bento {
 		display: grid;
 		gap: clamp(1.35rem, 2vw, 1.75rem);
+		max-width: 1000px;
+		margin: 0 auto;
 		margin-top: clamp(3.5rem, 8vw, 7rem);
 	}
 
@@ -100,21 +111,16 @@
 		align-items: stretch;
 	}
 
-	.project-media-bento__cell {
+	.project-media-bento__cell.is-half {
 		grid-column: span 6;
 	}
 
-	.project-media-bento__cell.is-hero {
+	.project-media-bento__cell.is-full {
 		grid-column: 1 / -1;
 	}
 
-	.project-media-bento__cell.is-wide {
-		grid-column: span 7;
-	}
-
-	.project-media-bento__cell.is-mobile,
-	.project-media-bento__cell.is-text {
-		grid-column: span 5;
+	.project-media-bento__cell.is-centered {
+		grid-column: 4 / span 6;
 	}
 
 	@media (max-width: 1024px) {
@@ -122,14 +128,15 @@
 			grid-template-columns: repeat(6, minmax(0, 1fr));
 		}
 
-		.project-media-bento__cell,
-		.project-media-bento__cell.is-wide,
-		.project-media-bento__cell.is-mobile,
-		.project-media-bento__cell.is-text {
+		.project-media-bento__cell.is-half {
 			grid-column: span 3;
 		}
 
-		.project-media-bento__cell.is-hero {
+		.project-media-bento__cell.is-centered {
+			grid-column: 2 / span 3;
+		}
+
+		.project-media-bento__cell.is-full {
 			grid-column: 1 / -1;
 		}
 	}
@@ -139,11 +146,9 @@
 			grid-template-columns: 1fr;
 		}
 
-		.project-media-bento__cell,
-		.project-media-bento__cell.is-wide,
-		.project-media-bento__cell.is-mobile,
-		.project-media-bento__cell.is-text,
-		.project-media-bento__cell.is-hero {
+		.project-media-bento__cell.is-half,
+		.project-media-bento__cell.is-centered,
+		.project-media-bento__cell.is-full {
 			grid-column: 1 / -1;
 		}
 	}

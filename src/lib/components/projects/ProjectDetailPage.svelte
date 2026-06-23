@@ -115,7 +115,12 @@
 					data-intro={introActive ? 'active' : 'pending'}
 					style:--project-detail-intro-delay={`${titleIntroDelayMs}ms`}
 				>
-					<ProjectTitleHoverEffect id="project-detail-title" lines={project.nameLines} />
+					<ProjectTitleHoverEffect
+						id="project-detail-title"
+						lines={project.nameLines}
+						colorPrimary={project.titleHighlight.primary}
+						colorSecondary={project.titleHighlight.secondary}
+					/>
 				</div>
 			</div>
 
@@ -170,7 +175,7 @@
 				</div>
 			</div>
 		</section>
-
+		
 		<ProjectMediaBento {project} revealReady={introActive} />
 	</div>
 </main>

@@ -11,46 +11,63 @@ export const projectPageSlugs = [
 
 export type ProjectPageSlug = (typeof projectPageSlugs)[number];
 
+/** Two-color palette used by the animated project title outline highlight. */
+export type ProjectTitleHighlight = {
+	primary: string;
+	secondary: string;
+};
+
 type ProjectPageCopy = {
 	infoParagraphs: readonly [string, ...string[]];
+	titleHighlight: ProjectTitleHighlight;
 };
+
+/** Studio Zohdi primary brand pink, mirrored from the `--pink` token in app.css. */
+const SITE_PINK = 'hsl(318, 78%, 53%)';
 
 const projectPageCopy: Record<ProjectPageSlug, ProjectPageCopy> = {
 	'foia-search': {
 		infoParagraphs: [
 			'FOIA Search helps users see related SEC FOIA activity for companies and organizations. It highlights B7A exemptions, investigation-related requests, and alert-oriented workflows for portfolios, IR teams, and reporter monitoring.'
-		]
+		],
+		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(172, 78%, 42%)' }
 	},
 	'stock-promotion-tracker': {
 		infoParagraphs: [
 			'Stock Promotion Tracker is a research platform for monitoring paid stock promotion disclosures, promoted companies, and campaign activity across multiple sources. The product emphasizes hourly updates, filters, risk context, and price-performance analysis.'
-		]
+		],
+		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(271, 81%, 60%)' }
 	},
 	'stop-nasdaq-china-fraud': {
 		infoParagraphs: [
 			'Stop Nasdaq China Fraud is a public evidence hub focused on pump-and-dump schemes involving U.S.-listed Chinese stocks. It invites users to upload suspicious WhatsApp screenshots and helps surface evidence that warns other investors.'
-		]
+		],
+		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(217, 91%, 60%)' }
 	},
 	highgroundresearch: {
 		infoParagraphs: [
 			'Highground Research is a prediction-market analytics product for Polymarket and Kalshi. It combines smart-money scanning, local-first personal analytics, market monitoring, and top-trader research in one interface.'
-		]
+		],
+		titleHighlight: { primary: 'hsl(25, 95%, 53%)', secondary: SITE_PINK }
 	},
 	'8ksearch': {
 		infoParagraphs: [
 			'8Ksearch helps users search high-risk 8-K filings with live updates and flexible filters. The experience is built for scanning company filings by market cap, date range, and filing type.'
-		]
+		],
+		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(217, 91%, 60%)' }
 	},
 	greffier: {
 		infoParagraphs: [
 			'Greffier is a local-first meeting transcription desktop app currently in development.'
-		]
+		],
+		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(48, 96%, 53%)' }
 	}
 };
 
 export type ProjectPage = FeaturedProject & {
 	slug: ProjectPageSlug;
 	infoParagraphs: readonly [string, ...string[]];
+	titleHighlight: ProjectTitleHighlight;
 	availabilityLabel: 'Live website' | 'In development';
 	websiteLabel: 'Visit website' | 'Website coming soon';
 	metaDescription: string;
@@ -78,6 +95,7 @@ export const projectPages: ProjectPage[] = projectPageSlugs.map((slug) => {
 		...featuredProject,
 		slug,
 		infoParagraphs: copy.infoParagraphs,
+		titleHighlight: copy.titleHighlight,
 		availabilityLabel: featuredProject.website ? 'Live website' : 'In development',
 		websiteLabel: featuredProject.website ? 'Visit website' : 'Website coming soon',
 		metaDescription: copy.infoParagraphs[0]

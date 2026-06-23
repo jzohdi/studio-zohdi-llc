@@ -9,6 +9,10 @@
 		id?: string;
 		lines: string[];
 		durationMs?: number;
+		/** First highlight color (any CSS color). Defaults to the site pink. */
+		colorPrimary?: string;
+		/** Second highlight color (any CSS color). */
+		colorSecondary?: string;
 	}
 
 	type TitleLineMetric = {
@@ -19,7 +23,13 @@
 
 	const instanceId = nextProjectTitleHoverId++;
 
-	let { id, lines, durationMs = 240 }: Props = $props();
+	let {
+		id,
+		lines,
+		durationMs = 240,
+		colorPrimary = 'hsl(318, 78%, 53%)',
+		colorSecondary = 'hsl(217, 91%, 60%)'
+	}: Props = $props();
 
 	let rootEl = $state<HTMLDivElement | null>(null);
 	let titleEl = $state<HTMLHeadingElement | null>(null);
@@ -243,11 +253,9 @@
 		>
 			<defs>
 				<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-					<stop offset="0%" stop-color="#eab308" />
-					<stop offset="25%" stop-color="#ef4444" />
-					<stop offset="50%" stop-color="#3b82f6" />
-					<stop offset="75%" stop-color="#06b6d4" />
-					<stop offset="100%" stop-color="#8b5cf6" />
+					<stop offset="0%" stop-color={colorPrimary} />
+					<stop offset="50%" stop-color={colorSecondary} />
+					<stop offset="100%" stop-color={colorPrimary} />
 				</linearGradient>
 
 				<radialGradient
@@ -324,7 +332,7 @@
 					font-weight={fontWeight}
 					letter-spacing={letterSpacingPx}
 					stroke-width={strokeWidthPx}
-					fill={`url(#${gradientId})`}
+					fill="none"
 					stroke={`url(#${gradientId})`}
 					mask={`url(#${maskId})`}
 					style:opacity={hovered ? 1 : 0}
@@ -404,7 +412,7 @@
 	}
 
 	.project-title-hover__gradient {
-		fill-opacity: 0.94;
+		fill: none;
 		transition: opacity 180ms ease;
 	}
 
