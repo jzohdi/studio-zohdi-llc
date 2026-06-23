@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import ProjectMobilePreview from '$lib/components/home/ProjectMobilePreview.svelte';
 	import { featuredProjects } from '$lib/data/featured-projects';
 </script>
@@ -11,7 +12,7 @@
 			<li>
 				<a
 					class="project-row"
-					href={`/projects/${project.id}`}
+					href={resolve(`/projects/${project.id}`)}
 					data-sveltekit-preload-data
 					aria-label={`View the ${project.name} project`}
 				>

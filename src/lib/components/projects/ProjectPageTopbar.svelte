@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import ThemeToggle from '$lib/components/home/ThemeToggle.svelte';
 	import type { ThemeName } from '$lib/utils/theme';
 
@@ -19,7 +20,7 @@
 	aria-label="Project page top bar"
 >
 	<div class="project-page-topbar__intro-item" style:--project-page-topbar-intro-index={0}>
-		<a class="project-page-topbar__brand" href="/">Studio Zohdi</a>
+		<a class="project-page-topbar__brand" href={resolve('/')}>Studio Zohdi</a>
 	</div>
 	<div
 		class="project-page-topbar__rule"
