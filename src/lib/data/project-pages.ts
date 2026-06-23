@@ -28,13 +28,22 @@ const SITE_PINK = 'hsl(318, 78%, 53%)';
 const projectPageCopy: Record<ProjectPageSlug, ProjectPageCopy> = {
 	'foia-search': {
 		infoParagraphs: [
-			'FOIA Search helps users see related SEC FOIA activity for companies and organizations. It highlights B7A exemptions, investigation-related requests, and alert-oriented workflows for portfolios, IR teams, and reporter monitoring.'
+			`Helps users inspect SEC FOIA activity for companies and by organizations, for exampl.` +
+			` B7A excemption are particularly interesting as these are correlated with ongoing SEC investigations.` +
+			` The SEC releases FOIA requests each month as CSV files, which are automatically parsed by site.`,
+			`Customers receive monthly alerts containing requests that match their search criteria.` +
+			` Investor relations teams monitor their companies, investors get alerted if their portfolio might be impacted, and a wide range of use cases` +
+			` are supported by following activty by prominent journalists. This allows users to find news before it is widely reported.`
 		],
 		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(172, 78%, 42%)' }
 	},
 	'stock-promotion-tracker': {
 		infoParagraphs: [
-			'Stock Promotion Tracker is a research platform for monitoring paid stock promotion disclosures, promoted companies, and campaign activity across multiple sources. The product emphasizes hourly updates, filters, risk context, and price-performance analysis.'
+			'A research platform for monitoring paid stock promotion disclosures, promoted companies, and campaign activity across multiple sources.' +
+			' Hedge funds, researchers, and retail investors use the site to monitor company activity and identify potential investment opportunities.' +
+			' For example, paid stock promotions may* indicate  that a company is overvalued due to synthetically inflated positive media coverage.',
+			' Other features include: Performance analysis that shows the impact of paid stock promotions on a company\'s stock price over time.' +
+			' API access for custom integrations. PDF exports for internal memos.'
 		],
 		titleHighlight: { primary: SITE_PINK, secondary: 'hsl(271, 81%, 60%)' }
 	},

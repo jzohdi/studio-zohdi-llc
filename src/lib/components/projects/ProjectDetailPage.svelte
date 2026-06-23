@@ -4,6 +4,7 @@
 	import TextGenerateReveal from '$lib/components/projects/TextGenerateReveal.svelte';
 	import ProjectTitleHoverEffect from '$lib/components/projects/ProjectTitleHoverEffect.svelte';
 	import ProjectPageTopbar from '$lib/components/projects/ProjectPageTopbar.svelte';
+	import ScrollCue from '$lib/components/projects/ScrollCue.svelte';
 	import type { ProjectPage } from '$lib/data/project-pages';
 	import {
 		applyTheme,
@@ -178,6 +179,8 @@
 
 		<ProjectMediaBento {project} revealReady={introActive} />
 	</div>
+
+	<ScrollCue active={introActive} introDelayMs={ctaIntroDelayMs + 220} />
 </main>
 
 <style>
@@ -309,7 +312,7 @@
 
 	.project-detail__copy p {
 		color: hsl(var(--foreground) / 0.9);
-		font-size: clamp(1.18rem, 2.25vw, 1.85rem);
+		font-size: clamp(1.18rem, 2.25vw, 1.5rem);
 		line-height: 1.42;
 		letter-spacing: -0.03em;
 		text-wrap: pretty;

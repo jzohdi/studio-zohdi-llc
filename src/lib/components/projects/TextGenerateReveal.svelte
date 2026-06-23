@@ -30,12 +30,15 @@
 	style:--text-generate-word-duration={`${wordDurationMs}ms`}
 >
 	{#each words as word, index (index)}
-		<span
-			class:text-generate-reveal__word--spaced={index < words.length - 1}
-			class="text-generate-reveal__word"
-			style:--text-generate-word-index={index}
-		>
-			{word}
+		<span>
+			<span
+				class:text-generate-reveal__word--spaced={index < words.length - 1}
+				class="text-generate-reveal__word"
+				style:--text-generate-word-index={index}
+			>
+				{word}
+			</span>
+			<span>{' '}</span>
 		</span>
 	{/each}
 </span>
@@ -57,7 +60,7 @@
 	}
 
 	.text-generate-reveal__word--spaced {
-		margin-inline-end: 0.26em;
+		margin-inline-end: 0.15em;
 	}
 
 	:global(html[data-js='true'])
