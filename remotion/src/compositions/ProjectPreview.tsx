@@ -1,14 +1,14 @@
-import React, {useMemo} from 'react';
-import {AbsoluteFill, Series, useCurrentFrame, useVideoConfig} from 'remotion';
-import {Background} from '../components/Background';
-import {SceneStage} from '../components/SceneStage';
+import React, { useMemo } from 'react';
+import { AbsoluteFill, Series, useCurrentFrame, useVideoConfig } from 'remotion';
+import { Background } from '../components/Background';
+import { SceneStage } from '../components/SceneStage';
 import {
 	getLoopedProjectScenes,
 	getProjectSceneStartFrames,
 	getProjectTimeline,
 	type ResolvedProjectScene
 } from '../lib/assets';
-import {bodyFontFamily, displayFontFamily} from '../lib/fonts';
+import { bodyFontFamily, displayFontFamily } from '../lib/fonts';
 
 export type ProjectPreviewProps = {
 	projectId: string;
@@ -28,7 +28,7 @@ export const ProjectPreview: React.FC<ProjectPreviewProps> = ({
 	loopToFirst = true
 }) => {
 	const frame = useCurrentFrame();
-	const {fps} = useVideoConfig();
+	const { fps } = useVideoConfig();
 	const timeline = useMemo(() => getProjectTimeline(projectId, fps), [projectId, fps]);
 	const renderScenes = useMemo<RenderScene[]>(() => {
 		const previewScenes = loopToFirst ? getLoopedProjectScenes(timeline.scenes) : timeline.scenes;
@@ -49,12 +49,13 @@ export const ProjectPreview: React.FC<ProjectPreviewProps> = ({
 		return frame >= startFrame ? index : activeIndex;
 	}, 0);
 	const currentSceneIndex = renderScenes[currentRenderSceneIndex]?.displayIndex ?? 0;
-	const domainLabel = timeline.project.website?.replace(/^https?:\/\//, '') ?? 'Desktop app preview';
+	const domainLabel =
+		timeline.project.website?.replace(/^https?:\/\//, '') ?? 'Desktop app preview';
 
 	return (
-		<AbsoluteFill style={{color: timeline.palette.label, fontFamily: bodyFontFamily}}>
+		<AbsoluteFill style={{ color: timeline.palette.label, fontFamily: bodyFontFamily }}>
 			<Background palette={timeline.palette} />
-			<AbsoluteFill style={{padding: '68px 78px 62px'}}>
+			<AbsoluteFill style={{ padding: '68px 78px 62px' }}>
 				<Series>
 					{renderScenes.map((renderScene, renderIndex) => (
 						<Series.Sequence

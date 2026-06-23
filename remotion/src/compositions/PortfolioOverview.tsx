@@ -1,9 +1,9 @@
-import React, {useMemo} from 'react';
-import {AbsoluteFill, Sequence, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
-import {motionProjects} from '../data/projects';
-import {bodyFontFamily, displayFontFamily} from '../lib/fonts';
-import {getProjectTimeline, getPortfolioOverviewDurationInFrames} from '../lib/assets';
-import {ProjectPreview} from './ProjectPreview';
+import React, { useMemo } from 'react';
+import { AbsoluteFill, Sequence, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
+import { motionProjects } from '../data/projects';
+import { bodyFontFamily, displayFontFamily } from '../lib/fonts';
+import { getProjectTimeline, getPortfolioOverviewDurationInFrames } from '../lib/assets';
+import { ProjectPreview } from './ProjectPreview';
 
 type OverviewTitleCardProps = {
 	durationInFrames: number;
@@ -102,7 +102,7 @@ const OverviewTitleCard: React.FC<OverviewTitleCardProps> = ({
 };
 
 export const PortfolioOverview: React.FC = () => {
-	const {fps} = useVideoConfig();
+	const { fps } = useVideoConfig();
 	const projectTimelines = useMemo(() => {
 		return motionProjects.map((project) => getProjectTimeline(project.id, fps));
 	}, [fps]);
@@ -110,7 +110,7 @@ export const PortfolioOverview: React.FC = () => {
 	let cursor = 0;
 
 	return (
-		<AbsoluteFill style={{background: '#f8f5f1'}}>
+		<AbsoluteFill style={{ background: '#f8f5f1' }}>
 			<div
 				style={{
 					position: 'absolute',
@@ -143,7 +143,11 @@ export const PortfolioOverview: React.FC = () => {
 						from={from}
 						durationInFrames={timeline.totalDurationInFrames}
 					>
-						<ProjectPreview projectId={timeline.project.id} showLockup={false} loopToFirst={false} />
+						<ProjectPreview
+							projectId={timeline.project.id}
+							showLockup={false}
+							loopToFirst={false}
+						/>
 						<OverviewTitleCard
 							durationInFrames={timeline.totalDurationInFrames}
 							label="Desktop app preview"

@@ -1,6 +1,6 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
-import type {MotionPalette} from '../data/projects';
+import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
+import type { MotionPalette } from '../data/projects';
 
 type BackgroundProps = {
 	palette: MotionPalette;
@@ -18,9 +18,9 @@ const grainSvg = `
 
 const grainTexture = `url("data:image/svg+xml,${encodeURIComponent(grainSvg)}")`;
 
-export const Background: React.FC<BackgroundProps> = ({palette}) => {
+export const Background: React.FC<BackgroundProps> = ({ palette }) => {
 	const frame = useCurrentFrame();
-	const {durationInFrames} = useVideoConfig();
+	const { durationInFrames } = useVideoConfig();
 	const phase = (frame / durationInFrames) * Math.PI * 2;
 	const driftX = Math.sin(phase * 0.7) * 5.2;
 	const driftY = Math.cos(phase * 0.55) * 5.8;
@@ -46,8 +46,7 @@ export const Background: React.FC<BackgroundProps> = ({palette}) => {
 			/>
 			<AbsoluteFill
 				style={{
-					background:
-						`radial-gradient(circle at 78% 16%, ${palette.backgroundStart}, transparent 28%), radial-gradient(circle at 70% 68%, ${palette.backgroundEnd}, transparent 34%)`,
+					background: `radial-gradient(circle at 78% 16%, ${palette.backgroundStart}, transparent 28%), radial-gradient(circle at 70% 68%, ${palette.backgroundEnd}, transparent 34%)`,
 					opacity: 0.08,
 					filter: 'blur(22px)',
 					transform: `translate(${-driftX * 0.7}%, ${-driftY * 0.5}%) scale(1.02)`

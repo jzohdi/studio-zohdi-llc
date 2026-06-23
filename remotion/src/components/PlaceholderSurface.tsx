@@ -1,7 +1,7 @@
 import React from 'react';
-import type {CSSProperties} from 'react';
-import type {MotionPalette} from '../data/projects';
-import {bodyFontFamily, displayFontFamily} from '../lib/fonts';
+import type { CSSProperties } from 'react';
+import type { MotionPalette } from '../data/projects';
+import { bodyFontFamily, displayFontFamily } from '../lib/fonts';
 
 type PlaceholderVariant = 'desktop' | 'mobile' | 'detail' | 'flow';
 
@@ -116,14 +116,14 @@ export const PlaceholderSurface: React.FC<PlaceholderSurfaceProps> = ({
 								boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.5)'
 							}}
 						/>
-						<div style={{display: 'grid', gap: 12}}>
+						<div style={{ display: 'grid', gap: 12 }}>
 							<div style={lineStyle('42%', 0.18)} />
 							<div style={lineStyle('88%')} />
 							<div style={lineStyle('74%')} />
 						</div>
 					</div>
 					{!isMobile && (
-						<div style={{display: 'grid', gap: 16}}>
+						<div style={{ display: 'grid', gap: 16 }}>
 							<div
 								style={{
 									padding: 18,
@@ -162,7 +162,7 @@ export const PlaceholderSurface: React.FC<PlaceholderSurfaceProps> = ({
 									gap: 12
 								}}
 							>
-								{Array.from({length: 3}).map((_, index) => (
+								{Array.from({ length: 3 }).map((_, index) => (
 									<div
 										key={index}
 										style={{

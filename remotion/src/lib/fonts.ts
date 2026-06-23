@@ -1,5 +1,5 @@
-import {loadFont as loadBodyFont} from '@remotion/google-fonts/Inter';
-import {loadFont as loadDisplayFont} from '@remotion/google-fonts/LeagueSpartan';
+import { loadFont as loadBodyFont } from '@remotion/google-fonts/Inter';
+import { loadFont as loadDisplayFont } from '@remotion/google-fonts/LeagueSpartan';
 
 const displayFont = loadDisplayFont('normal', {
 	subsets: ['latin'],
