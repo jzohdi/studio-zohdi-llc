@@ -75,13 +75,13 @@
 		onpointerleave={hideHoverTag}
 	>
 		{#each featuredProjects as project, index (project.id)}
-			<button
-				type="button"
+			<a
 				class={`project-button ${project.id === activeProjectId ? 'is-active' : ''}`}
 				id={`project-trigger-${project.id}`}
+				href={`/projects/${project.id}`}
+				data-sveltekit-preload-data
 				style:grid-row={index + 1}
-				aria-pressed={project.id === activeProjectId}
-				onclick={() => setActiveProject(project.id)}
+				aria-label={`View the ${project.name} project`}
 				onfocus={() => setActiveProject(project.id)}
 				onpointerenter={(event) => handleProjectPointerEnter(project.id, event)}
 			>
@@ -90,7 +90,7 @@
 						<span class="project-button__line">{line}</span>
 					{/each}
 				</span>
-			</button>
+			</a>
 		{/each}
 
 		<div class="desktop-showcase__stage" aria-labelledby={`project-trigger-${activeProject.id}`}>

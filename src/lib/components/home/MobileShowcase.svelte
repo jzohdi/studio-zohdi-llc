@@ -9,7 +9,12 @@
 	<ul class="mobile-showcase__list">
 		{#each featuredProjects as project (project.id)}
 			<li>
-				<article class="project-row">
+				<a
+					class="project-row"
+					href={`/projects/${project.id}`}
+					data-sveltekit-preload-data
+					aria-label={`View the ${project.name} project`}
+				>
 					<div class="project-row__copy">
 						<h2>{project.name}</h2>
 						<p>{project.summary}</p>
@@ -18,7 +23,7 @@
 					<div class="project-row__visual">
 						<ProjectMobilePreview {project} />
 					</div>
-				</article>
+				</a>
 			</li>
 		{/each}
 	</ul>

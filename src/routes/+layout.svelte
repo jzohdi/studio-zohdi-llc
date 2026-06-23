@@ -1,9 +1,31 @@
 <script lang="ts">
 	import '../app.css';
 	import type { Snippet } from 'svelte';
+	import { onNavigate } from '$app/navigation';
 	import favicon from '$lib/assets/favicon.svg';
+	import PageTransition from '$lib/components/PageTransition.svelte';
+	import { pageTransition } from '$lib/utils/page-transition.svelte';
 
 	let { children }: { children: Snippet } = $props();
+
+	onNavigate((navigation) => {
+		const from = navigation.from?.url.pathname;
+		const to = navigation.to?.url.pathname;
+
+		// Only cover real same-app route changes (skip hash-only / same-page nav).
+		if (!to || from === to) {
+			return;
+		}
+
+		const playReveal = pageTransition.cover(to);
+		if (!playReveal) {
+			return;
+		}
+
+		// Hold the navigation until the viewport is fully covered, then reveal the
+		// new page once SvelteKit has swapped the DOM.
+		return playReveal.then((reveal) => reveal);
+	});
 </script>
 
 <svelte:head>
@@ -38,3 +60,5 @@
 </svelte:head>
 
 {@render children()}
+
+<PageTransition />

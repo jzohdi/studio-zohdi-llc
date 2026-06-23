@@ -80,7 +80,7 @@
 		height: 100%;
 		padding: clamp(0.9rem, 2vw, 1.35rem);
 		border: 1px solid hsl(0 0% 100% / 0.35);
-		/* border-radius: var(--preview-inner-radius); */
+		border-radius: var(--preview-inner-radius);
 	}
 
 	.preview-card__surface::after {
