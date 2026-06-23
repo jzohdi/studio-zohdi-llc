@@ -4,6 +4,9 @@
 	import type { ProjectMediaItem } from '$lib/components/projects/project-media';
 	import MacbookFrame from '$lib/components/projects/devices/MacbookFrame.svelte';
 	import PhoneFrame from '$lib/components/projects/devices/PhoneFrame.svelte';
+	import ProjectVideoEmbed from '$lib/components/projects/ProjectVideoEmbed.svelte';
+	import GithubGlobe from '$lib/components/projects/GithubGlobe.svelte';
+	import DdosShield from '$lib/components/projects/DdosShield.svelte';
 
 	interface Props {
 		item: ProjectMediaItem;
@@ -19,23 +22,11 @@
 
 	const prefersReducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)', true);
 
-	let itemTitleId = $derived(`project-media-${item.id}`);
 	let shouldAnimate = $derived(item.kind === 'video' && revealed && !prefersReducedMotion.current);
 	let isMobileSurface = $derived(item.surface === 'mobile');
 	let screenAspectRatio = $derived(
 		item.source?.aspectRatio ??
 			(isMobileSurface ? mobileScreenAspectRatio : desktopScreenAspectRatio)
-	);
-	let mediaEyebrow = $derived(
-		item.kind === 'text'
-			? 'Callout'
-			: isMobileSurface
-				? item.mediaType === 'recording'
-					? 'Mobile demo'
-					: 'Mobile view'
-				: item.mediaType === 'recording'
-					? 'Live demo'
-					: 'Desktop view'
 	);
 
 	function syncMediaPlayback(shouldPlay: boolean) {
@@ -98,17 +89,31 @@
 	data-kind={item.kind}
 	data-revealed={revealed ? 'true' : 'false'}
 	data-surface={item.surface}
-	aria-labelledby={item.kind === 'text' ? itemTitleId : undefined}
-	aria-label={item.kind !== 'text' && item.label ? item.label : undefined}
+	aria-label={(item.kind === 'image' || item.kind === 'video' || item.kind === 'logo') && item.label
+		? item.label
+		: undefined}
 >
 	<div class="project-media-tile__frame">
 		{#if item.kind === 'text' && item.text}
-			<div class="project-media-tile__meta">
-				<p class="project-media-tile__eyebrow eyebrow">{mediaEyebrow}</p>
-				<h3 class="project-media-tile__title" id={itemTitleId}>{item.label}</h3>
-			</div>
-			<div class="project-media-tile__text">
+			<div class="project-media-tile__text" data-variant={item.textVariant ?? 'display'}>
 				<p>{item.text}</p>
+			</div>
+		{:else if item.kind === 'graphic' && item.graphic?.id === 'ddos'}
+			<div class="project-media-tile__embed project-media-tile__embed--graphic">
+				<DdosShield label={item.label} />
+			</div>
+		{:else if item.kind === 'youtube' && item.youtube}
+			<div class="project-media-tile__embed">
+				<ProjectVideoEmbed
+					videoId={item.youtube.videoId}
+					startSeconds={item.youtube.startSeconds}
+					caption={item.youtube.caption}
+					title={item.label}
+				/>
+			</div>
+		{:else if item.kind === 'globe' && item.globe}
+			<div class="project-media-tile__embed project-media-tile__embed--globe">
+				<GithubGlobe title={item.globe.title} />
 			</div>
 		{:else if item.kind === 'logo' && item.sourceUrl}
 			<div class="project-media-tile__logo-stage">
@@ -223,28 +228,6 @@
 		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 70ms);
 	}
 
-	.project-media-tile__meta {
-		position: relative;
-		z-index: 1;
-		display: grid;
-		gap: 0.35rem;
-		transition:
-			opacity 720ms cubic-bezier(0.22, 1, 0.36, 1),
-			transform 820ms cubic-bezier(0.22, 1, 0.36, 1);
-		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 50ms);
-	}
-
-	.project-media-tile__eyebrow {
-		color: var(--tile-muted);
-	}
-
-	.project-media-tile__title {
-		color: var(--tile-strong);
-		font-size: clamp(0.98rem, 1.4vw, 1.18rem);
-		font-weight: 600;
-		letter-spacing: -0.03em;
-	}
-
 	.project-media-tile__stage,
 	.project-media-tile__logo-stage {
 		position: relative;
@@ -299,15 +282,18 @@
 	}
 
 	.project-media-tile[data-kind='text'] .project-media-tile__frame {
-		align-content: space-between;
+		grid-template-rows: 1fr;
 	}
 
 	.project-media-tile__text {
 		position: relative;
 		z-index: 1;
 		display: grid;
-		align-content: end;
+		place-items: center;
+		height: 100%;
 		min-height: clamp(13rem, 22vw, 17rem);
+		padding: clamp(1rem, 2.6vw, 2rem);
+		text-align: center;
 		transition:
 			opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
 			transform 960ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -316,14 +302,28 @@
 	}
 
 	.project-media-tile__text p {
+		margin: 0;
 		max-width: 12ch;
-		color: var(--tile-strong);
+		color: hsl(var(--foreground));
 		font-family: var(--font-display);
 		font-size: clamp(2rem, 4vw, 3.35rem);
 		font-weight: 700;
 		line-height: 0.9;
 		letter-spacing: -0.05em;
 		text-wrap: balance;
+	}
+
+	/* Longer sentences read better left-aligned at a more moderate size. */
+	.project-media-tile__text[data-variant='statement'] {
+		place-items: center start;
+		text-align: left;
+	}
+
+	.project-media-tile__text[data-variant='statement'] p {
+		max-width: 26ch;
+		font-size: clamp(1.2rem, 1.05rem + 1.1vw, 1.85rem);
+		line-height: 1.16;
+		letter-spacing: -0.02em;
 	}
 
 	.project-media-tile__media {
@@ -335,6 +335,22 @@
 		background: linear-gradient(180deg, rgb(227 233 242), rgb(242 245 248));
 		transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
 		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 80ms);
+	}
+
+	.project-media-tile__embed {
+		position: relative;
+		z-index: 1;
+		height: 100%;
+		transition:
+			opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
+			transform 960ms cubic-bezier(0.22, 1, 0.36, 1),
+			filter 780ms ease;
+		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 100ms);
+	}
+
+	.project-media-tile__embed--globe,
+	.project-media-tile__embed--graphic {
+		background: transparent;
 	}
 
 	:global(html[data-js='true']) .project-media-tile[data-revealed='false'] {
@@ -359,20 +375,16 @@
 
 	:global(html[data-js='true'])
 		.project-media-tile[data-revealed='false']
-		.project-media-tile__meta {
-		opacity: 0;
-		transform: translate3d(0, 0.95rem, 0);
-	}
-
-	:global(html[data-js='true'])
-		.project-media-tile[data-revealed='false']
 		.project-media-tile__stage,
 	:global(html[data-js='true'])
 		.project-media-tile[data-revealed='false']
 		.project-media-tile__logo-stage,
 	:global(html[data-js='true'])
 		.project-media-tile[data-revealed='false']
-		.project-media-tile__text {
+		.project-media-tile__text,
+	:global(html[data-js='true'])
+		.project-media-tile[data-revealed='false']
+		.project-media-tile__embed {
 		opacity: 0;
 		filter: blur(0.42rem);
 		transform: translate3d(0, 1.4rem, 0) scale(1.025);
@@ -409,12 +421,12 @@
 		.project-media-tile,
 		.project-media-tile__frame,
 		.project-media-tile__frame::before,
-		.project-media-tile__meta,
 		.project-media-tile__stage,
 		.project-media-tile__logo-stage,
 		.project-media-tile__logo,
 		.project-media-tile__device,
 		.project-media-tile__text,
+		.project-media-tile__embed,
 		.project-media-tile__media {
 			transition: none;
 		}
@@ -441,9 +453,6 @@
 
 		:global(html[data-js='true'])
 			.project-media-tile[data-revealed='false']
-			.project-media-tile__meta,
-		:global(html[data-js='true'])
-			.project-media-tile[data-revealed='false']
 			.project-media-tile__stage,
 		:global(html[data-js='true'])
 			.project-media-tile[data-revealed='false']
@@ -454,6 +463,9 @@
 		:global(html[data-js='true'])
 			.project-media-tile[data-revealed='false']
 			.project-media-tile__text,
+		:global(html[data-js='true'])
+			.project-media-tile[data-revealed='false']
+			.project-media-tile__embed,
 		:global(html[data-js='true'])
 			.project-media-tile[data-revealed='false']
 			.project-media-tile__media {

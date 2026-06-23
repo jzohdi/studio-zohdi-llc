@@ -5,6 +5,7 @@
 	import ProjectTitleHoverEffect from '$lib/components/projects/ProjectTitleHoverEffect.svelte';
 	import ProjectPageTopbar from '$lib/components/projects/ProjectPageTopbar.svelte';
 	import ScrollCue from '$lib/components/projects/ScrollCue.svelte';
+	import { countRevealWords } from '$lib/components/projects/text-generate-reveal';
 	import type { ProjectPage } from '$lib/data/project-pages';
 	import {
 		applyTheme,
@@ -33,10 +34,6 @@
 	let introStarted = $state(false);
 	let theme = $state<ThemeName>('light');
 	let { project }: Props = $props();
-
-	function countRevealWords(text: string) {
-		return text.trim().split(/\s+/).filter(Boolean).length;
-	}
 
 	function estimateRevealDuration(text: string, wordStaggerMs: number, wordDurationMs: number) {
 		return wordDurationMs + Math.max(0, countRevealWords(text) - 1) * wordStaggerMs;

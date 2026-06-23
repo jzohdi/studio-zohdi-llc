@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { buildRevealChunks } from '$lib/components/projects/text-generate-reveal';
+
 	interface Props {
 		text: string;
 		active?: boolean;
@@ -18,7 +20,7 @@
 	}: Props = $props();
 
 	let state = $derived<'pending' | 'active'>(active ? 'active' : 'pending');
-	let words = $derived(text.trim().split(/\s+/).filter(Boolean));
+	let chunks = $derived(buildRevealChunks(text));
 </script>
 
 <span
@@ -29,17 +31,76 @@
 	style:--text-generate-word-stagger={`${wordStaggerMs}ms`}
 	style:--text-generate-word-duration={`${wordDurationMs}ms`}
 >
-	{#each words as word, index (index)}
-		<span>
-			<span
-				class:text-generate-reveal__word--spaced={index < words.length - 1}
-				class="text-generate-reveal__word"
-				style:--text-generate-word-index={index}
-			>
-				{word}
+	{#each chunks as chunk, chunkIndex (chunkIndex)}
+		{#if chunk.kind === 'link'}
+			<a class="text-generate-reveal__link" {...chunk.attributes}>
+				{#each chunk.segments as segment, segmentIndex (segmentIndex)}
+					{#if segment.strong}
+						<strong>
+							{#each segment.pieces as piece, pieceIndex (pieceIndex)}
+								{#if piece.kind === 'word'}
+									<span
+										class="text-generate-reveal__word"
+										style:--text-generate-word-index={piece.wordIndex}
+									>
+										{piece.text}
+									</span>
+								{:else}
+									{piece.text}
+								{/if}
+							{/each}
+						</strong>
+					{:else}
+						{#each segment.pieces as piece, pieceIndex (pieceIndex)}
+							{#if piece.kind === 'word'}
+								<span
+									class="text-generate-reveal__word"
+									style:--text-generate-word-index={piece.wordIndex}
+								>
+									{piece.text}
+								</span>
+							{:else}
+								{piece.text}
+							{/if}
+						{/each}
+					{/if}
+				{/each}
+			</a>
+		{:else}
+			<span>
+				{#each chunk.segments as segment, segmentIndex (segmentIndex)}
+					{#if segment.strong}
+						<strong>
+							{#each segment.pieces as piece, pieceIndex (pieceIndex)}
+								{#if piece.kind === 'word'}
+									<span
+										class="text-generate-reveal__word"
+										style:--text-generate-word-index={piece.wordIndex}
+									>
+										{piece.text}
+									</span>
+								{:else}
+									{piece.text}
+								{/if}
+							{/each}
+						</strong>
+					{:else}
+						{#each segment.pieces as piece, pieceIndex (pieceIndex)}
+							{#if piece.kind === 'word'}
+								<span
+									class="text-generate-reveal__word"
+									style:--text-generate-word-index={piece.wordIndex}
+								>
+									{piece.text}
+								</span>
+							{:else}
+								{piece.text}
+							{/if}
+						{/each}
+					{/if}
+				{/each}
 			</span>
-			<span>{' '}</span>
-		</span>
+		{/if}
 	{/each}
 </span>
 
@@ -59,8 +120,39 @@
 		will-change: opacity, filter, transform;
 	}
 
-	.text-generate-reveal__word--spaced {
-		margin-inline-end: 0.15em;
+	.text-generate-reveal__link,
+	.text-generate-reveal__link > span {
+		color: blue;
+		border-radius: 0.18rem;
+		text-decoration-line: underline;
+		text-decoration-style: solid;
+		text-decoration-color: currentColor;
+		text-decoration-skip-ink: auto;
+		text-decoration-thickness: 0.095em;
+		text-underline-offset: 0.16em;
+		transition:
+			color 180ms ease,
+			text-decoration-color 180ms ease,
+			text-decoration-thickness 180ms ease,
+			text-underline-offset 180ms ease;
+	}
+
+	.text-generate-reveal__link:hover,
+	.text-generate-reveal__link:hover > span {
+		color: var(--project-accent, hsl(var(--foreground)));
+		text-decoration-color: var(--project-accent, currentColor);
+		text-decoration-thickness: 0.12em;
+		text-underline-offset: 0.22em;
+	}
+
+	.text-generate-reveal__link:focus-visible,
+	.text-generate-reveal__link:focus-visible > span {
+		outline: 2px solid hsl(var(--pink));
+		outline-offset: 4px;
+		color: var(--project-accent, hsl(var(--foreground)));
+		text-decoration-color: var(--project-accent, currentColor);
+		text-decoration-thickness: 0.12em;
+		text-underline-offset: 0.22em;
 	}
 
 	:global(html[data-js='true'])

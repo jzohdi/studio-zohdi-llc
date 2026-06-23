@@ -55,6 +55,94 @@ describe('getProjectMediaItems', () => {
 		expect(getProjectMediaItems('whatever')).toEqual([]);
 	});
 
+	it('uses the curated stock promotion tracker order and spans', () => {
+		mockCarousel(
+			[
+				makeScene({ id: 'desktopScreenRecordings-0', sourceUrl: '/desktop-demo.mp4' }),
+				makeScene({
+					id: 'textFrames-2',
+					kind: 'text',
+					surface: 'text',
+					mediaType: 'text',
+					label: 'Text Frame 03',
+					text: 'Track how tickers perform before, during, and after promotions',
+					source: null,
+					sourceUrl: null
+				}),
+				makeScene({
+					id: 'mobileScreenshots-0',
+					kind: 'image',
+					surface: 'mobile',
+					mediaType: 'screenshot',
+					source: {
+						path: '/mobile.png',
+						type: 'image/png',
+						width: 9,
+						height: 16,
+						aspectRatio: 0.56
+					},
+					sourceUrl: '/mobile.png'
+				}),
+				makeScene({
+					id: 'desktopScreenshots-0',
+					kind: 'image',
+					surface: 'desktop',
+					mediaType: 'screenshot',
+					source: {
+						path: '/desktop.png',
+						type: 'image/png',
+						width: 16,
+						height: 10,
+						aspectRatio: 1.6
+					},
+					sourceUrl: '/desktop.png'
+				}),
+				makeScene({
+					id: 'mobileScreenRecordings-0',
+					surface: 'mobile',
+					sourceUrl: '/mobile-demo.mp4'
+				})
+			],
+			makePoster()
+		);
+
+		expect(
+			getProjectMediaItems('stock-promotion-tracker').map((item) => [item.id, item.span])
+		).toEqual([
+			['desktopScreenshots-0', 'full'],
+			['mobileScreenshots-0', 'half'],
+			['textFrames-2', 'half'],
+			['desktopScreenRecordings-0', 'full']
+		]);
+	});
+
+	it('builds the curated stop-nasdaq-china-fraud rows (youtube, globe, mobile recording, statement, graphic)', () => {
+		mockCarousel([
+			makeScene({
+				id: 'mobileScreenRecordings-0',
+				surface: 'mobile',
+				sourceUrl: '/mobile-demo.mp4'
+			})
+		]);
+
+		const items = getProjectMediaItems('stop-nasdaq-china-fraud');
+
+		expect(items.map((item) => [item.kind, item.span])).toEqual([
+			['youtube', 'full'],
+			['globe', 'half'],
+			['video', 'half'],
+			['text', 'half'],
+			['graphic', 'half']
+		]);
+		expect(items[0].youtube?.videoId).toBe('dJ2nr4Q-Ptk');
+		expect(items[0].youtube?.startSeconds).toBe(1014);
+		expect(items[1].globe?.title).toBe('API used by investors globally');
+		expect(items[2].id).toBe('mobileScreenRecordings-0');
+		expect(items[3].textVariant).toBe('statement');
+		expect(items[3].text).toContain('DDoS mitigation');
+		expect(items[4].graphic?.id).toBe('ddos');
+	});
+
 	it('places the desktop hero scene first, ahead of earlier non-hero scenes', () => {
 		const intro = makeScene({
 			id: 'intro',
