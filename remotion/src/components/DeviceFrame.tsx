@@ -1,5 +1,5 @@
 import React from 'react';
-import type {CSSProperties, ReactNode} from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 type BrowserFrameProps = {
 	children: ReactNode;
@@ -20,7 +20,7 @@ const screenStyle: CSSProperties = {
 	background: 'rgba(255,255,255,0.96)'
 };
 
-export const BrowserFrame: React.FC<BrowserFrameProps> = ({children, style, url}) => {
+export const BrowserFrame: React.FC<BrowserFrameProps> = ({ children, style, url }) => {
 	return (
 		<div
 			style={{
@@ -32,8 +32,7 @@ export const BrowserFrame: React.FC<BrowserFrameProps> = ({children, style, url}
 				padding: 14,
 				border: '1px solid rgba(245, 251, 249, 0.44)',
 				background: 'rgba(13, 15, 26, 0.9)',
-				boxShadow:
-					'0 36px 110px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(255,255,255,0.05)',
+				boxShadow: '0 36px 110px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(255,255,255,0.05)',
 				backdropFilter: 'blur(18px)',
 				...style
 			}}
@@ -47,9 +46,9 @@ export const BrowserFrame: React.FC<BrowserFrameProps> = ({children, style, url}
 					paddingInline: 10
 				}}
 			>
-				<div style={{width: 11, height: 11, borderRadius: 999, background: '#ff6b63'}} />
-				<div style={{width: 11, height: 11, borderRadius: 999, background: '#ffcf3f'}} />
-				<div style={{width: 11, height: 11, borderRadius: 999, background: '#2ad05b'}} />
+				<div style={{ width: 11, height: 11, borderRadius: 999, background: '#ff6b63' }} />
+				<div style={{ width: 11, height: 11, borderRadius: 999, background: '#ffcf3f' }} />
+				<div style={{ width: 11, height: 11, borderRadius: 999, background: '#2ad05b' }} />
 				<div
 					style={{
 						flex: 1,
@@ -71,7 +70,7 @@ export const BrowserFrame: React.FC<BrowserFrameProps> = ({children, style, url}
 	);
 };
 
-export const PhoneFrame: React.FC<PhoneFrameProps> = ({children, style}) => {
+export const PhoneFrame: React.FC<PhoneFrameProps> = ({ children, style }) => {
 	return (
 		<div
 			style={{
@@ -82,10 +81,8 @@ export const PhoneFrame: React.FC<PhoneFrameProps> = ({children, style}) => {
 				borderRadius: 42,
 				padding: 10,
 				border: '1px solid rgba(245, 251, 249, 0.22)',
-				background:
-					'linear-gradient(180deg, rgba(20, 23, 34, 0.94), rgba(7, 10, 18, 0.98) 100%)',
-				boxShadow:
-					'0 30px 90px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255,255,255,0.04)',
+				background: 'linear-gradient(180deg, rgba(20, 23, 34, 0.94), rgba(7, 10, 18, 0.98) 100%)',
+				boxShadow: '0 30px 90px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255,255,255,0.04)',
 				...style
 			}}
 		>

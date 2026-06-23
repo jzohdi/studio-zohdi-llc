@@ -1,8 +1,8 @@
 import React from 'react';
-import {AbsoluteFill, Img, OffthreadVideo} from 'remotion';
-import type {MotionPalette} from '../data/projects';
-import type {ResolvedProjectScene} from '../lib/assets';
-import {PlaceholderSurface} from './PlaceholderSurface';
+import { AbsoluteFill, Img, OffthreadVideo } from 'remotion';
+import type { MotionPalette } from '../data/projects';
+import type { ResolvedProjectScene } from '../lib/assets';
+import { PlaceholderSurface } from './PlaceholderSurface';
 
 type MediaSurfaceProps = {
 	asset: ResolvedProjectScene | null;

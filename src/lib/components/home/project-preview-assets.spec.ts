@@ -115,10 +115,7 @@ describe('project preview assets', () => {
 			'/project-previews/greffier/carousel/assets/desktop_1.png'
 		);
 		expect(previewCarousel?.scenes.map((scene) => scene.text)).toEqual([null, 'Coming Soon']);
-		expect(previewCarousel?.scenes.map((scene) => scene.mediaType)).toEqual([
-			'screenshot',
-			'text'
-		]);
+		expect(previewCarousel?.scenes.map((scene) => scene.mediaType)).toEqual(['screenshot', 'text']);
 	});
 
 	it('resolves the 8ksearch carousel while keeping the mobile preview image out of the scene list', () => {

@@ -175,7 +175,7 @@
 				</div>
 			</div>
 		</section>
-		
+
 		<ProjectMediaBento {project} revealReady={introActive} />
 	</div>
 </main>
