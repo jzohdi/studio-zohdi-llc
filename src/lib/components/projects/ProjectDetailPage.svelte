@@ -6,6 +6,9 @@
 	import ProjectPageTopbar from '$lib/components/projects/ProjectPageTopbar.svelte';
 	import ScrollCue from '$lib/components/projects/ScrollCue.svelte';
 	import { countRevealWords } from '$lib/components/projects/text-generate-reveal';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE } from '$lib/seo/site';
+	import { breadcrumbSchema, projectSchema } from '$lib/seo/structured-data';
 	import type { ProjectPage } from '$lib/data/project-pages';
 	import {
 		applyTheme,
@@ -90,12 +93,24 @@
 		applyTheme(theme);
 		persistTheme(theme);
 	}
+
+	let canonicalPath = $derived(`/projects/${project.slug}`);
+	let pageTitle = $derived(`${project.name} | ${SITE.titleSuffix}`);
 </script>
 
-<svelte:head>
-	<title>{project.name} | Studio Zohdi</title>
-	<meta name="description" content={project.metaDescription} />
-</svelte:head>
+<Seo
+	title={pageTitle}
+	description={project.metaDescription}
+	path={canonicalPath}
+	type="article"
+	jsonLd={[
+		projectSchema(project, canonicalPath),
+		breadcrumbSchema([
+			{ name: 'Home', path: '/' },
+			{ name: project.name, path: canonicalPath }
+		])
+	]}
+/>
 
 <main class="project-detail" data-accent={project.accent}>
 	<div class="container project-detail__container">

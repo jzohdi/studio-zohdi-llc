@@ -37,6 +37,7 @@
 <svelte:head>
 	<title>{pageTitle}</title>
 	<meta name="description" content={supportingCopy} />
+	<meta name="robots" content="noindex" />
 </svelte:head>
 
 <main class="error-page">

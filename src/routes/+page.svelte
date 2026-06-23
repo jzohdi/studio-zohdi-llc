@@ -4,6 +4,9 @@
 	import DesktopShowcase from '$lib/components/home/DesktopShowcase.svelte';
 	import MobileShowcase from '$lib/components/home/MobileShowcase.svelte';
 	import Topbar from '$lib/components/home/Topbar.svelte';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE } from '$lib/seo/site';
+	import { organizationSchema, websiteSchema } from '$lib/seo/structured-data';
 	import { featuredProjects } from '$lib/data/featured-projects';
 	import {
 		applyTheme,
@@ -28,13 +31,13 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Studio Zohdi | Premium freelance web development</title>
-	<meta
-		name="description"
-		content="Studio Zohdi is a premium freelance web development studio showcasing recent client work across product, commerce, creative, and energy experiences."
-	/>
-</svelte:head>
+<Seo
+	title={SITE.defaultTitle}
+	description={SITE.description}
+	path="/"
+	type="website"
+	jsonLd={[organizationSchema(), websiteSchema()]}
+/>
 
 <div class="home-shell">
 	<Topbar {theme} onToggle={handleThemeToggle} />
