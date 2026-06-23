@@ -218,7 +218,6 @@
 		content: '';
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 30%);
 		pointer-events: none;
 		transition: opacity 720ms ease;
 		transition-delay: calc(var(--project-media-reveal-delay, 0ms) + 70ms);
