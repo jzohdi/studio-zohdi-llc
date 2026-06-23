@@ -1,9 +1,12 @@
 import React from 'react';
-import {Composition} from 'remotion';
-import {motionProjects} from './data/projects';
-import {PortfolioOverview, portfolioOverviewDurationInFrames} from './compositions/PortfolioOverview';
-import {ProjectPreview} from './compositions/ProjectPreview';
-import {getProjectPreviewDurationInFrames} from './lib/assets';
+import { Composition } from 'remotion';
+import { motionProjects } from './data/projects';
+import {
+	PortfolioOverview,
+	portfolioOverviewDurationInFrames
+} from './compositions/PortfolioOverview';
+import { ProjectPreview } from './compositions/ProjectPreview';
+import { getProjectPreviewDurationInFrames } from './lib/assets';
 
 const fps = 30;
 const width = 1920;

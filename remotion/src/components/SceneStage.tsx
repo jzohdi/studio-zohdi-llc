@@ -1,11 +1,11 @@
 import React from 'react';
-import type {CSSProperties} from 'react';
-import {AbsoluteFill, Easing, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
-import type {MotionPalette} from '../data/projects';
-import type {ResolvedProjectScene} from '../lib/assets';
-import {displayFontFamily} from '../lib/fonts';
-import {BrowserFrame, PhoneFrame} from './DeviceFrame';
-import {MediaSurface} from './MediaSurface';
+import type { CSSProperties } from 'react';
+import { AbsoluteFill, Easing, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
+import type { MotionPalette } from '../data/projects';
+import type { ResolvedProjectScene } from '../lib/assets';
+import { displayFontFamily } from '../lib/fonts';
+import { BrowserFrame, PhoneFrame } from './DeviceFrame';
+import { MediaSurface } from './MediaSurface';
 
 type SceneStageProps = {
 	domainLabel: string;
@@ -38,7 +38,9 @@ const getOffscreenMargin = (videoWidth: number): number => {
 	return Math.max(160, Math.round(videoWidth * 0.06));
 };
 
-const getSceneLabelVariant = (scene: ResolvedProjectScene): 'desktop' | 'mobile' | 'detail' | 'flow' => {
+const getSceneLabelVariant = (
+	scene: ResolvedProjectScene
+): 'desktop' | 'mobile' | 'detail' | 'flow' => {
 	if (scene.mediaType === 'recording') {
 		return 'flow';
 	}
@@ -56,7 +58,10 @@ const getTextFrameLayout = (showLockup: boolean): CSSProperties => {
 
 const getTextFrameFontSize = (text: string): number => {
 	const lines = text.split('\n');
-	const longestLineLength = lines.reduce((longest, line) => Math.max(longest, line.trim().length), 0);
+	const longestLineLength = lines.reduce(
+		(longest, line) => Math.max(longest, line.trim().length),
+		0
+	);
 
 	if (lines.length >= 4 || longestLineLength >= 34) {
 		return 92;
@@ -143,11 +148,13 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 	transitionDurationInFrames
 }) => {
 	const frame = useCurrentFrame();
-	const {width, height} = useVideoConfig();
+	const { width, height } = useVideoConfig();
 	const exitStartFrame = Math.max(0, scene.durationInFrames - transitionDurationInFrames);
 	const exitFrame = frame - exitStartFrame;
 	const isTextScene = scene.kind === 'text';
-	const layoutMetrics = isTextScene ? null : getSceneLayoutMetrics(scene, showLockup, width, height);
+	const layoutMetrics = isTextScene
+		? null
+		: getSceneLayoutMetrics(scene, showLockup, width, height);
 	const textTravelDistance = width + Math.max(220, Math.round(width * 0.18));
 	const incomingOffsetX = isTextScene
 		? textTravelDistance
@@ -187,7 +194,7 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 		const textFrameFontSize = getTextFrameFontSize(scene.text ?? '');
 
 		return (
-			<AbsoluteFill style={{pointerEvents: 'none'}}>
+			<AbsoluteFill style={{ pointerEvents: 'none' }}>
 				<div
 					style={{
 						position: 'absolute',
@@ -222,8 +229,7 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 								letterSpacing: '-0.055em',
 								whiteSpace: 'pre-wrap',
 								color: overlayTextStrong,
-								textShadow:
-									'0 18px 56px rgba(0,0,0,0.34), 0 2px 0 rgba(255,255,255,0.08)'
+								textShadow: '0 18px 56px rgba(0,0,0,0.34), 0 2px 0 rgba(255,255,255,0.08)'
 							}}
 						>
 							{scene.text}
@@ -246,12 +252,10 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 		mediaLayoutMetrics.glowWidth / 2 +
 		translateX;
 	const glowTop =
-		mediaLayoutMetrics.top +
-		mediaLayoutMetrics.height / 2 -
-		mediaLayoutMetrics.glowHeight / 2;
+		mediaLayoutMetrics.top + mediaLayoutMetrics.height / 2 - mediaLayoutMetrics.glowHeight / 2;
 	const labelVariant = getSceneLabelVariant(scene);
 	const stageBody = (
-		<div style={{position: 'relative', width: '100%', height: '100%'}}>
+		<div style={{ position: 'relative', width: '100%', height: '100%' }}>
 			<MediaSurface
 				asset={scene}
 				fit={scene.fit}
@@ -282,7 +286,7 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 	};
 
 	return (
-		<AbsoluteFill style={{pointerEvents: 'none'}}>
+		<AbsoluteFill style={{ pointerEvents: 'none' }}>
 			<div
 				style={{
 					position: 'absolute',
