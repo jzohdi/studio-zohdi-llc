@@ -209,14 +209,6 @@
 		display: grid;
 		gap: 1rem;
 		height: 100%;
-		padding: clamp(1rem, 2vw, 1.35rem);
-		border-radius: 4px;
-		background:
-			linear-gradient(155deg, var(--tile-shell-start), var(--tile-shell-end)),
-			radial-gradient(circle at top, rgb(255 255 255 / 0.24), transparent 52%);
-		box-shadow:
-			var(--shadow-card),
-			0 24px 70px var(--tile-glow);
 		isolation: isolate;
 		transition: box-shadow 920ms cubic-bezier(0.22, 1, 0.36, 1);
 		transition-delay: var(--project-media-reveal-delay, 0ms);
