@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { MediaQuery } from 'svelte/reactivity';
 	import ProjectDesktopPreview from '$lib/components/home/ProjectDesktopPreview.svelte';
 	import { preloadProjectPreviewAssets } from '$lib/components/home/project-preview-assets';
@@ -78,7 +79,7 @@
 			<a
 				class={`project-button ${project.id === activeProjectId ? 'is-active' : ''}`}
 				id={`project-trigger-${project.id}`}
-				href={`/projects/${project.id}`}
+				href={resolve(`/projects/${project.id}`)}
 				data-sveltekit-preload-data
 				style:grid-row={index + 1}
 				aria-label={`View the ${project.name} project`}

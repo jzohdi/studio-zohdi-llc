@@ -154,6 +154,7 @@
 						style:--project-detail-intro-delay={`${ctaIntroDelayMs}ms`}
 					>
 						{#if project.website}
+							<!-- eslint-disable svelte/no-navigation-without-resolve -- external project URL, not an internal route -->
 							<a
 								class="project-detail__cta eyebrow"
 								href={project.website}
@@ -163,6 +164,7 @@
 								{project.websiteLabel}
 								<span aria-hidden="true">→</span>
 							</a>
+							<!-- eslint-enable svelte/no-navigation-without-resolve -->
 						{:else}
 							<span
 								class="project-detail__cta project-detail__cta--disabled eyebrow"
