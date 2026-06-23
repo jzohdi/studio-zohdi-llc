@@ -16,6 +16,25 @@
 	/>
 	<meta name="theme-color" content="#f8f8fb" media="(prefers-color-scheme: light)" />
 	<meta name="theme-color" content="#090d14" media="(prefers-color-scheme: dark)" />
+	<script>
+		document.documentElement.dataset.js = 'true';
+
+		try {
+			const storageKey = 'studio-zohdi-theme';
+			const storedTheme = window.localStorage.getItem(storageKey);
+			const resolvedTheme =
+				storedTheme === 'light' || storedTheme === 'dark'
+					? storedTheme
+					: window.matchMedia('(prefers-color-scheme: dark)').matches
+						? 'dark'
+						: 'light';
+
+			document.documentElement.dataset.theme = resolvedTheme;
+			document.documentElement.style.colorScheme = resolvedTheme;
+		} catch {
+			// Keep the CSS default theme if storage or media queries are unavailable.
+		}
+	</script>
 </svelte:head>
 
 {@render children()}

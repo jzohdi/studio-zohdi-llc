@@ -71,7 +71,11 @@
 
 	@media (max-width: 900px) {
 		.topbar {
-			padding-bottom: 1rem;
+			position: absolute;
+			inset-block-start: var(--page-padding-block);
+			inset-inline: 0;
+			z-index: 5;
+			padding-block: 0;
 		}
 
 		.topbar__rule,
@@ -82,6 +86,7 @@
 		.topbar__mobile {
 			display: flex;
 			width: 100%;
+			align-items: flex-start;
 			justify-content: flex-end;
 		}
 	}

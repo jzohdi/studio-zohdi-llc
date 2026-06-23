@@ -186,6 +186,7 @@
 <style>
 	.home-shell {
 		min-height: 100svh;
+		position: relative;
 		padding-block: var(--page-padding-block) clamp(1.75rem, 4vw, 3rem);
 	}
 
@@ -343,7 +344,7 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
 		gap: 0.95rem;
-		align-items: center;
+		align-items: start;
 		padding: 1rem 0;
 		border: 0;
 		border-radius: 0;
