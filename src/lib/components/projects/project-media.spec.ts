@@ -143,6 +143,66 @@ describe('getProjectMediaItems', () => {
 		expect(items[4].graphic?.id).toBe('ddos');
 	});
 
+	it('builds the curated highgroundresearch rows (desktop recording, mobile screenshot, mobile recording, desktop recording)', () => {
+		mockCarousel([
+			makeScene({
+				id: 'desktopScreenRecordings-0',
+				sourceUrl: '/desktop-recording-1.mp4'
+			}),
+			makeScene({
+				id: 'textFrames-0',
+				kind: 'text',
+				surface: 'text',
+				mediaType: 'text',
+				label: 'Text Frame 01',
+				text: 'See where the sharp money is trading',
+				source: null,
+				sourceUrl: null
+			}),
+			makeScene({
+				id: 'desktopScreenshots-0',
+				kind: 'image',
+				surface: 'desktop',
+				mediaType: 'screenshot',
+				source: {
+					path: '/desktop.png',
+					type: 'image/png',
+					width: 16,
+					height: 10,
+					aspectRatio: 1.6
+				},
+				sourceUrl: '/desktop.png'
+			}),
+			makeScene({
+				id: 'desktopScreenRecordings-1',
+				sourceUrl: '/desktop-recording-2.mp4'
+			}),
+			makeScene({
+				id: 'mobileScreenRecordings-0',
+				surface: 'mobile',
+				source: {
+					path: '/mobile-recording.mp4',
+					type: 'video/mp4',
+					width: 9,
+					height: 19,
+					aspectRatio: 0.47
+				},
+				sourceUrl: '/mobile-recording.mp4'
+			})
+		]);
+
+		const items = getProjectMediaItems('highgroundresearch');
+
+		expect(items.map((item) => [item.id, item.kind, item.span])).toEqual([
+			['desktopScreenRecordings-0', 'video', 'full'],
+			['highgroundresearch-mobile-1', 'image', 'half'],
+			['mobileScreenRecordings-0', 'video', 'half'],
+			['desktopScreenRecordings-1', 'video', 'full']
+		]);
+		expect(items[1].surface).toBe('mobile');
+		expect(items[1].source?.path).toBe('remotion/public/projects/highgroundresearch/mobile_1.png');
+	});
+
 	it('places the desktop hero scene first, ahead of earlier non-hero scenes', () => {
 		const intro = makeScene({
 			id: 'intro',

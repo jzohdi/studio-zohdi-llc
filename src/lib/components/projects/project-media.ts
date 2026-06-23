@@ -7,6 +7,11 @@ import {
 
 type AssetPath = Parameters<typeof asset>[0];
 
+const highgroundResearchMobileOneUrl = new URL(
+	'/project-previews/highgroundresearch/mobile_1.png',
+	import.meta.url
+).href;
+
 export type ProjectMediaSpan = 'full' | 'half';
 
 export type ProjectMediaItemSource = {
@@ -30,7 +35,7 @@ export type ProjectMediaGlobe = {
 };
 
 /** Identifies which animated graphic a `graphic` tile should render. */
-export type ProjectMediaGraphicId = 'ddos';
+export type ProjectMediaGraphicId = 'ddos' | 'live-feed';
 
 /** Payload for an animated graphic tile. */
 export type ProjectMediaGraphic = {
@@ -70,12 +75,30 @@ type CuratedBentoEntry =
 	| { kind: 'scene'; sceneId: string; span: ProjectMediaSpan }
 	| { kind: 'logo'; span: ProjectMediaSpan }
 	| {
-			kind: 'youtube';
-			videoId: string;
-			startSeconds?: number;
-			caption: string;
-			span: ProjectMediaSpan;
-	  }
+		kind: 'asset';
+		id: string;
+		label: string;
+		mediaKind: Extract<ProjectMediaItem['kind'], 'image' | 'video'>;
+		surface: Extract<ProjectMediaItem['surface'], 'desktop' | 'mobile'>;
+		mediaType: Extract<ProjectMediaItem['mediaType'], 'screenshot' | 'recording'>;
+		span: ProjectMediaSpan;
+		fit?: ProjectMediaItem['fit'];
+		source: {
+			path: string;
+			url: string;
+			type: string;
+			width?: number;
+			height?: number;
+			aspectRatio?: number;
+		};
+	}
+	| {
+		kind: 'youtube';
+		videoId: string;
+		startSeconds?: number;
+		caption: string;
+		span: ProjectMediaSpan;
+	}
 	| { kind: 'globe'; title: string; span: ProjectMediaSpan }
 	| { kind: 'text'; text: string; variant?: ProjectMediaTextVariant; span: ProjectMediaSpan }
 	| { kind: 'graphic'; graphic: ProjectMediaGraphicId; label: string; span: ProjectMediaSpan };
@@ -116,6 +139,38 @@ const curatedProjectBento: Record<string, CuratedBentoEntry[]> = {
 				'Animated diagram of distributed denial-of-service attacks being absorbed by a mitigation shield',
 			span: 'half'
 		}
+	],
+	highgroundresearch: [
+		{ kind: 'scene', sceneId: 'desktopScreenRecordings-0', span: 'full' },
+		{
+			kind: 'asset',
+			id: 'highgroundresearch-mobile-1',
+			label: 'Prediction analytics on mobile',
+			mediaKind: 'image',
+			surface: 'mobile',
+			mediaType: 'screenshot',
+			span: 'half',
+			fit: 'contain',
+			source: {
+				path: '/project-previews/highgroundresearch/mobile_1.png',
+				url: highgroundResearchMobileOneUrl,
+				type: 'image/png'
+			}
+		},
+		{ kind: 'scene', sceneId: 'mobileScreenRecordings-0', span: 'half' },
+		{ kind: 'scene', sceneId: 'desktopScreenRecordings-1', span: 'full' }
+	],
+	'8ksearch': [
+		{ kind: 'scene', sceneId: 'desktopScreenRecordings-1', span: 'full' },
+		{ kind: 'scene', sceneId: 'textFrames-0', span: 'half' },
+		{
+			kind: 'graphic',
+			graphic: 'live-feed',
+			label:
+				'Animated live feed of incoming 8-K filings, with high-impact filings highlighted as they arrive',
+			span: 'half'
+		},
+		{ kind: 'scene', sceneId: 'desktopScreenRecordings-0', span: 'full' }
 	]
 };
 
@@ -152,12 +207,12 @@ function mapSceneToMediaItem(
 		fit: scene.fit,
 		source: scene.source
 			? {
-					path: scene.source.path,
-					type: scene.source.type,
-					width: scene.source.width,
-					height: scene.source.height,
-					aspectRatio: scene.source.aspectRatio
-				}
+				path: scene.source.path,
+				type: scene.source.type,
+				width: scene.source.width,
+				height: scene.source.height,
+				aspectRatio: scene.source.aspectRatio
+			}
 			: null,
 		sourceUrl: scene.sourceUrl,
 		youtube: null,
@@ -216,6 +271,33 @@ function createLogoMediaItem(projectId: string, span: ProjectMediaSpan): Project
 		youtube: null,
 		globe: null,
 		textVariant: null,
+		graphic: null
+	};
+}
+
+function createAssetMediaItem(
+	entry: Extract<CuratedBentoEntry, { kind: 'asset' }>
+): ProjectMediaItem {
+	return {
+		id: entry.id,
+		label: entry.label,
+		kind: entry.mediaKind,
+		surface: entry.surface,
+		mediaType: entry.mediaType,
+		span: entry.span,
+		text: null,
+		textVariant: null,
+		fit: entry.fit ?? 'contain',
+		source: {
+			path: entry.source.path,
+			type: entry.source.type,
+			width: entry.source.width ?? null,
+			height: entry.source.height ?? null,
+			aspectRatio: entry.source.aspectRatio ?? null
+		},
+		sourceUrl: entry.source.url,
+		youtube: null,
+		globe: null,
 		graphic: null
 	};
 }
@@ -334,6 +416,11 @@ function getCuratedMediaItems(
 
 		if (entry.kind === 'youtube') {
 			curatedItems.push(createYouTubeMediaItem(entry));
+			continue;
+		}
+
+		if (entry.kind === 'asset') {
+			curatedItems.push(createAssetMediaItem(entry));
 			continue;
 		}
 

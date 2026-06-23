@@ -62,12 +62,12 @@ const projectPageCopy: Record<ProjectPageSlug, ProjectPageCopy> = {
 	highgroundresearch: {
 		infoParagraphs: [
 			'A prediction market analytics product for Polymarket and Kalshi. It combines various frontier strategies including:',
-			' Local first personal analytics platform powered by DuckDB WASM. This feature allows users to upload their trading history and analyze their own trading data.' +
+			' <strong>Local first personal analytics</strong> platform powered by DuckDB WASM. This feature allows users to upload their trading history and analyze their own trading data.' +
 			' The displayed insights, such as Yes vs No pricing based ROI, show users where their strength or weaknesses lie.',
-			' Smart money scanning, which identifies when sharp money is lopsided to one side of a market outcome. Find where the smart money is trading against dumb money, and potentially uncovering insider trading.',
-			' Market monitoring allows users to track changes in kalshi and polymarket events, such as volume anomalies and price shifts.' +
+			' <strong>Smart money scanning</strong>, which identifies when sharp money is lopsided to one side of a market outcome. Find where the smart money is trading against dumb money, and potentially uncovering insider trading.',
+			' <strong>Market monitoring</strong> allows users to track changes in kalshi and polymarket events, such as volume anomalies and price shifts.' +
 			' Users configure alerts and how the want to be notified using an intuitive interface.',
-			' Top trader research provides a list of active traders on polymarket with at least $1M lifetime profit.' +
+			' <strong>Top trader research</strong> provides a list of active traders on polymarket with at least $1M lifetime profit.' +
 			' This allows users to follow activity for strategy insights and see where the top traders are holding positions that agree with each other.'
 		],
 		titleHighlight: { primary: 'hsl(25, 95%, 53%)', secondary: SITE_PINK }

@@ -7,6 +7,7 @@
 	import ProjectVideoEmbed from '$lib/components/projects/ProjectVideoEmbed.svelte';
 	import GithubGlobe from '$lib/components/projects/GithubGlobe.svelte';
 	import DdosShield from '$lib/components/projects/DdosShield.svelte';
+	import LiveFeed from '$lib/components/projects/LiveFeed.svelte';
 
 	interface Props {
 		item: ProjectMediaItem;
@@ -101,6 +102,10 @@
 		{:else if item.kind === 'graphic' && item.graphic?.id === 'ddos'}
 			<div class="project-media-tile__embed project-media-tile__embed--graphic">
 				<DdosShield label={item.label} />
+			</div>
+		{:else if item.kind === 'graphic' && item.graphic?.id === 'live-feed'}
+			<div class="project-media-tile__embed project-media-tile__embed--graphic">
+				<LiveFeed label={item.label} />
 			</div>
 		{:else if item.kind === 'youtube' && item.youtube}
 			<div class="project-media-tile__embed">
