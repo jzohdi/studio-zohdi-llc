@@ -28,8 +28,8 @@ const SITE_PINK = 'hsl(318, 78%, 53%)';
 const projectPageCopy: Record<ProjectPageSlug, ProjectPageCopy> = {
 	'foia-search': {
 		infoParagraphs: [
-			`Helps users inspect SEC FOIA activity for companies and by organizations, for exampl.` +
-			` B7A excemption are particularly interesting as these are correlated with ongoing SEC investigations.` +
+			`Helps users inspect SEC FOIA activity for companies and by organizations, for example.` +
+			` B7A excemptions are particularly interesting as these are correlated with ongoing SEC investigations.` +
 			` The SEC releases FOIA requests each month as CSV files, which are automatically parsed by site.`,
 			`Customers receive monthly alerts containing requests that match their search criteria.` +
 			` Investor relations teams monitor their companies, investors get alerted if their portfolio might be impacted, and a wide range of use cases` +
