@@ -8,12 +8,12 @@ export const SITE = {
 	name: 'Studio Zohdi',
 	/** Short title suffix appended to per-page titles. */
 	titleSuffix: 'Studio Zohdi',
-	defaultTitle: 'Studio Zohdi | Premium freelance web development',
+	defaultTitle: 'Studio Zohdi | Software Development Studio',
 	description:
-		'Studio Zohdi is a premium freelance web development studio showcasing recent client work across product, commerce, creative, and energy experiences.',
+		'Studio Zohdi is a Software Development Studio showcasing recent client work across product, commerce, creative, and energy experiences.',
 	/** 1200×630 social share card, served from `static/`. */
 	ogImage: '/og-image.png',
-	ogImageAlt: 'Studio Zohdi — premium freelance web development',
+	ogImageAlt: 'Studio Zohdi — Software Development Studio',
 	locale: 'en_US',
 	twitterCard: 'summary_large_image'
 } as const;

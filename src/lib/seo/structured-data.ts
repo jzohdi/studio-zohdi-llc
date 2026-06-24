@@ -20,13 +20,25 @@ export function organizationSchema(): Record<string, unknown> {
 		description: SITE.description,
 		logo: absoluteUrl('/favicon_io/android-chrome-512x512.png'),
 		image: absoluteUrl(SITE.ogImage),
-		slogan: 'Premium freelance web development',
+		slogan: 'Software Development Studio',
 		knowsAbout: [
-			'Web development',
-			'SvelteKit',
-			'Frontend engineering',
+			'Software development',
 			'Product design',
-			'Data visualization'
+			'Data visualization',
+			'AI',
+			'Machine learning',
+			'Web development',
+			'Frontend engineering',
+			'Backend engineering',
+			'Full-stack engineering',
+			'DevOps',
+			'Cloud computing',
+			'Database management',
+			'Data modeling',
+			'Data security',
+			'Scalability',
+			'Performance optimization',
+			'Security'
 		],
 		areaServed: 'Worldwide'
 	};

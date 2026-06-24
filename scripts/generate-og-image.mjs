@@ -112,12 +112,12 @@ const html = `<!doctype html>
   <div class="frame"></div>
   <div class="top">
     <div class="mark">${mark}</div>
-    <div class="eyebrow">Freelance Web Studio</div>
+    <div class="eyebrow">Software Development Studio</div>
   </div>
 
   <div>
     <div class="headline">Studio <span class="accent">Zohdi</span></div>
-    <div class="tagline">Premium freelance web development</div>
+    <div class="tagline">Software Development Studio</div>
     <div class="rule"></div>
   </div>
 

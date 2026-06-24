@@ -1,6 +1,6 @@
 # Studio Zohdi
 
-Studio Zohdi is a SvelteKit marketing and portfolio website for a freelance web development business. The current focus is building a polished, responsive homepage with tasteful motion, clean theming, and a structure that can grow as real case-study content is added.
+Studio Zohdi is a SvelteKit marketing and portfolio website for a freelance Software Development Studio business. The current focus is building a polished, responsive homepage with tasteful motion, clean theming, and a structure that can grow as real case-study content is added.
 
 ## Stack
 

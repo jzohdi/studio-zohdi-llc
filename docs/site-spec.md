@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Build a premium portfolio and company website for a freelance web development business. The site should feel modern, confident, and polished while staying clear, fast, and professional.
+Build a premium portfolio and company website for a Software Development Studio business. The site should feel modern, confident, and polished while staying clear, fast, and professional.
 
 ## Design Direction
 
