@@ -76,7 +76,7 @@ Primary dark theme tokens:
 
 ## Typography
 
-- Preferred direction: `League Spartan` for display typography
+- Preferred direction: `League Spartan` for display typography — self-hosted via `@fontsource-variable/league-spartan` (family name `'League Spartan Variable'`), with the latin file preloaded from the root layout; not loaded from Google Fonts
 - Body text should stay highly readable and can use a system sans fallback stack
 - Headline styling should be bold, condensed, and graphic
 - Small navigation labels should be uppercase with tracking

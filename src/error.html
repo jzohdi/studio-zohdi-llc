@@ -38,7 +38,8 @@
 				--background: 0 0% 100%;
 				--foreground: 222.2 84% 4.9%;
 				--pink: 318 78% 53%;
-				--font-display: 'League Spartan', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+				--font-display:
+					'League Spartan Variable', 'League Spartan', 'Arial Narrow', 'Helvetica Neue', sans-serif;
 				--font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 				color-scheme: light;
 			}
@@ -238,7 +239,9 @@
 				const isNotFound = status === 404;
 				const title = document.getElementById('error-title');
 
-				document.title = isNotFound ? '404 Not Found | Studio Zohdi' : 'System Error | Studio Zohdi';
+				document.title = isNotFound
+					? '404 Not Found | Studio Zohdi'
+					: 'System Error | Studio Zohdi';
 
 				if (title) {
 					title.innerHTML = isNotFound

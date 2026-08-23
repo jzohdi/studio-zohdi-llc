@@ -45,6 +45,7 @@
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"dependencies": {
+		"@fontsource-variable/league-spartan": "^5.3.0",
 		"three": "^0.184.0",
 		"three-globe": "^2.45.2"
 	}

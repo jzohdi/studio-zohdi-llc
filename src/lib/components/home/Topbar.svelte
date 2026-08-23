@@ -19,7 +19,7 @@
 			class="topbar__text-control topbar__text-control--cta"
 			href="mailto:jake@studio-zohdi-llc.com"
 		>
-			LET'S TALK!
+			LET'S TALK
 		</a>
 	</div>
 
@@ -66,7 +66,12 @@
 	}
 
 	.topbar__text-control--cta {
-		color: hsl(var(--pink) / 0.74);
+		color: var(--pink-link);
+		transition: color 180ms ease;
+	}
+
+	.topbar__text-control--cta:hover {
+		color: hsl(var(--foreground));
 	}
 
 	@media (max-width: 900px) {

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	interface Props {
 		/** Number of featured projects, shown as a zero-padded count. */
 		projectCount: number;
@@ -9,8 +11,10 @@
 
 <div class="brand-block">
 	<h1 id="homepage-title" class="brand-block__title">
-		<span>STUDIO</span>
-		<span>ZOHDI</span>
+		<a class="brand-block__home" href={resolve('/')} data-sveltekit-preload-data>
+			<span>STUDIO</span>
+			<span>ZOHDI</span>
+		</a>
 	</h1>
 	<p class="brand-block__count eyebrow">
 		RECENT PROJECTS ({projectCount.toString().padStart(2, '0')})
@@ -28,13 +32,23 @@
 	}
 
 	.brand-block__title {
-		display: grid;
-		gap: 0.18rem;
 		font-size: clamp(0.78rem, 1vw, 0.9rem);
 		font-weight: 600;
 		line-height: 0.92;
 		letter-spacing: 0.24em;
 		text-transform: uppercase;
+	}
+
+	/* The wordmark is the route back to the landing page. */
+	.brand-block__home {
+		display: grid;
+		gap: 0.18rem;
+		width: fit-content;
+		transition: color 180ms ease;
+	}
+
+	.brand-block__home:hover {
+		color: hsl(var(--foreground) / 0.62);
 	}
 
 	.brand-block__count {

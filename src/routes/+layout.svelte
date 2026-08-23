@@ -1,5 +1,10 @@
 <script lang="ts">
 	import '../app.css';
+	// League Spartan is shipped with the site (variable weight axis, one file per script
+	// subset) rather than fetched from Google Fonts, so no page's first paint waits on a
+	// third party and the latin file can be preloaded.
+	import '@fontsource-variable/league-spartan';
+	import leagueSpartanLatinWoff2 from '@fontsource-variable/league-spartan/files/league-spartan-latin-wght-normal.woff2?url';
 	import type { Snippet } from 'svelte';
 	import { onNavigate } from '$app/navigation';
 	import favicon from '$lib/assets/favicon.svg';
@@ -34,11 +39,12 @@
 	<link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png" />
 	<link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png" />
 	<link rel="manifest" href="/favicon_io/site.webmanifest" />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
-		rel="stylesheet"
-		href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap"
+		rel="preload"
+		as="font"
+		type="font/woff2"
+		href={leagueSpartanLatinWoff2}
+		crossorigin="anonymous"
 	/>
 	<meta name="theme-color" content="#f8f8fb" media="(prefers-color-scheme: light)" />
 	<meta name="theme-color" content="#090d14" media="(prefers-color-scheme: dark)" />

@@ -33,6 +33,8 @@ export const REVEAL_TOTAL_MS = REVEAL_DURATION_MS + REVEAL_STAGGER_MS * (PANEL_C
 const LIGHT_BACKGROUND = 'hsl(0 0% 100%)';
 const PROJECT_DARK_BACKGROUND = 'hsl(220 14% 7%)';
 const HOME_DARK_BACKGROUND = 'hsl(222.2 84% 4.9%)';
+/** Studio Zohdi pink, mirrored from the `--pink` token in app.css. */
+const STUDIO_PINK = 'hsl(318 78% 53%)';
 
 /**
  * Resolves the solid colour the cover should settle on so it matches the
@@ -53,10 +55,10 @@ function projectSlugFromPath(pathname: string): string | null {
 }
 
 /**
- * Ordered colours for the cover sweeps. Navigating to a project page leads with
- * the project's two title-highlight colours (its brand pink + accent) before
- * settling on the destination background, producing three quick successive
- * sweeps. Every other navigation uses a single background sweep.
+ * Ordered colours for the cover sweeps. Every destination leads with its own
+ * colour before settling on its background: a project page leads with its two
+ * title-highlight colours (three sweeps); the studio's own pages — the landing
+ * page and /work — lead with the studio pink (two sweeps).
  */
 function coverWavesFor(pathname: string, theme: ThemeName): string[] {
 	const background = backgroundColorFor(pathname, theme);
@@ -64,7 +66,7 @@ function coverWavesFor(pathname: string, theme: ThemeName): string[] {
 	const project = slug ? getProjectPage(slug) : null;
 
 	if (!project) {
-		return [background];
+		return [STUDIO_PINK, background];
 	}
 
 	const { primary, secondary } = project.titleHighlight;

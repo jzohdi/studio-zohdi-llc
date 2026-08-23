@@ -10,3 +10,6 @@ bun.lockb
 
 # Generated files (written by the publish scripts, not hand-formatted)
 /src/lib/generated/
+
+# Wayfinder maps (hand-written planning notes, not product code)
+/.scratch/

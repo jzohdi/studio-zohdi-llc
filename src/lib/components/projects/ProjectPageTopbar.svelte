@@ -20,7 +20,7 @@
 	aria-label="Project page top bar"
 >
 	<div class="project-page-topbar__intro-item" style:--project-page-topbar-intro-index={0}>
-		<a class="project-page-topbar__brand" href={resolve('/')}>Studio Zohdi</a>
+		<a class="project-page-topbar__brand" href={resolve('/work')}>Studio Zohdi</a>
 	</div>
 	<div
 		class="project-page-topbar__rule"
@@ -37,7 +37,7 @@
 				class="project-page-topbar__text-control project-page-topbar__text-control--cta"
 				href="mailto:jake@studio-zohdi-llc.com"
 			>
-				LET'S TALK!
+				LET'S TALK
 			</a>
 		</div>
 	</div>
@@ -159,11 +159,11 @@
 	}
 
 	.project-page-topbar__text-control--cta {
-		color: hsl(var(--pink) / 0.74);
+		color: var(--pink-link);
 	}
 
 	.project-page-topbar__text-control--cta:hover {
-		color: hsl(var(--pink) / 0.92);
+		color: hsl(var(--foreground));
 	}
 
 	@media (prefers-reduced-motion: reduce) {
