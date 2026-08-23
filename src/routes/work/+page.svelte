@@ -32,7 +32,7 @@
 </script>
 
 <Seo
-	title={SITE.defaultTitle}
+	title={`Work | ${SITE.titleSuffix}`}
 	description={SITE.description}
 	path="/work"
 	type="website"

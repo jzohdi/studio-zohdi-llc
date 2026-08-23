@@ -1,7 +1,7 @@
 # Look at it on a real phone
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: —
 
 ## Question
@@ -17,3 +17,9 @@ HITL — only Jake can do this; the agent cannot. Everything so far was judged i
 How to do it: run `pnpm dev --host` and open the Network URL on the phone, or deploy the branch to a Vercel preview. Try it once in light and once in dark.
 
 The answer is one of: "fine, nothing to change"; or a short list of what stuttered and where, which becomes the next ticket. Either closes the map.
+
+## Answer
+
+**Fine — nothing to change.** Jake ran the branch on a real phone over the LAN (`pnpm dev --host`, http://192.168.12.51:5173/) and checked the list: the entrance (including the blur on the three display-type beats), the pink-led transition into `/work` and its carousel, the way back via the wordmark, and the wordmark's tap target — in light and dark. All smooth, nothing stutters, nothing needs to give.
+
+This was the map's last open ticket. **The destination is reached.**

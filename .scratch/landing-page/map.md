@@ -4,6 +4,8 @@ Label: wayfinder:map
 
 ## Destination
 
+**REACHED** — every ticket is resolved and Jake has approved the result on desktop and on a real phone. The prototype lives on `feat/landing-page`. What remains is the production-hardening follow-on listed under Out of scope, which is a fresh effort, not this map's.
+
 An approved, working prototype on a feature branch: a new single-screen landing page at `/`, with today's homepage relocated to `/work`, where the entrance motion and the route transition between the two both feel right to Jake. The map ends at that approval — production hardening ships as a separate follow-on effort.
 
 ## Notes
@@ -31,6 +33,8 @@ An approved, working prototype on a feature branch: a new single-screen landing 
 - [The transition to /work, and the way back](issues/05-transition-to-work.md) — Approved: the studio's pages lead with studio pink in the existing wave system (projects keep their two highlights); `/work`'s wordmark links home, project wordmarks stay pointed at `/work`; `LET'S TALK` unified on one AA-passing `--pink-link` token site-wide; no arrival intro on `/work`; late-start on slow networks accepted.
 - [Font swap on the statement](issues/06-font-swap-on-the-statement.md) — The swap is real (~300ms of fallback face even on a fast network, and the fallback is narrower so it reflows). The landing entrance now waits on `document.fonts.ready`, capped at 1.2s; Jake chose to go further and self-host the face — graduated to [Self-host League Spartan](issues/07-self-host-league-spartan.md).
 - [Self-host League Spartan](issues/07-self-host-league-spartan.md) — Done: `@fontsource-variable/league-spartan`, one preloaded 24 KB latin file, Google Fonts removed from the layout. On the production build the face is ready 127ms in and the entrance gate is a no-op; `/work` and project pages unchanged.
+- [Tab titles for the two pages](issues/08-tab-titles-for-the-two-pages.md) — `/work` is now `Work | Studio Zohdi`; the landing keeps the default title. Meta description left for the out-of-scope SEO pass.
+- [Look at it on a real phone](issues/09-look-at-it-on-a-real-phone.md) — Jake checked entrance, transition, and tap targets on a real phone in both themes: all smooth, nothing to change.
 
 ## Not yet specified
 
