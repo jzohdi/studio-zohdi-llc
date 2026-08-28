@@ -61,3 +61,7 @@ The sector or industry. A services list. Any technology or stack. Location. Avai
 ### Amendment (after the composition was built)
 
 Jake dropped the em dash: the sentence is now **"I take software products from idea to live and keep them there."** Same words, one breath instead of two.
+
+### Amendment 2 (August 2026)
+
+Jake changed the final clause: the sentence is now **"I take software products from idea to live and keep them growing."**

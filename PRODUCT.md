@@ -33,7 +33,7 @@ Visitors land on `/` (the landing page), click through to `/work` (the project s
 
 - SvelteKit 2 / Svelte 5 runes, fully prerendered, deployed to Vercel. No server runtime at request time.
 - The landing page is **one fixed screen with no scroll** (settled while charting the wayfinder map).
-- The landing page body copy is exactly one sentence: _"I take software products from idea to live and keep them there."_ Plus the studio name and three links: `See the work →` (primary, to `/work`), `More about me ↗` (secondary, external to jakezohdi.dev), and `let's talk` (tertiary, deliberately quieter, mailto). This word budget is a hard constraint, not a target.
+- The landing page body copy is exactly one sentence: _"I take software products from idea to live and keep them growing."_ Plus the studio name and three links: `See the work →` (primary, to `/work`), `More about me ↗` (secondary, external to jakezohdi.dev), and `let's talk` (tertiary, deliberately quieter, mailto). This word budget is a hard constraint, not a target.
 - Deliberately unsaid anywhere on the landing page: sector/industry, services list, tech stack, location, availability, rates, team size.
 - `/work` gets minimal adjustments only — no redesign.
 - Respect `prefers-reduced-motion` everywhere; motion must never block reading or navigation.

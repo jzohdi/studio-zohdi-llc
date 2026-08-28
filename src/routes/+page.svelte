@@ -1,6 +1,6 @@
 <!--
 	THESIS: The page is one sentence, and the sentence is a span of time — idea → live → kept
-	there — so the layout stages it as that span. It refuses the centred-tagline-plus-two-buttons
+	growing — so the layout stages it as that span. It refuses the centred-tagline-plus-two-buttons
 	landing, and it refuses a reprise of /work's list.
 	OWN-WORLD: The incumbent Studio Zohdi world, inherited whole: League Spartan display in
 	uppercase at /work's scale, HSL neutrals carrying everything, pink only on the links.
@@ -32,7 +32,7 @@
 	import { runAfterInitialPaint } from '$lib/utils/after-paint';
 
 	/** The entire body copy of the page. Settled in the wayfinder map; do not extend. */
-	const statement = 'I take software products from idea to live and keep them there.';
+	const statement = 'I take software products from idea to live and keep them growing.';
 
 	/**
 	 * Entrance state. `pending` → `active` plays the staged entrance; `instant` is a page
@@ -135,7 +135,7 @@
 		<h1 id="landing-statement" class="statement">
 			<span class="statement__beat" style:--beat-index={0}>I take software products</span>
 			<span class="statement__beat" style:--beat-index={1}>from idea to live</span>
-			<span class="statement__beat" style:--beat-index={2}>and keep them there.</span>
+			<span class="statement__beat" style:--beat-index={2}>and keep them growing.</span>
 		</h1>
 	</main>
 
