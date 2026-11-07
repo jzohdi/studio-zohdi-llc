@@ -12,13 +12,11 @@ type SitemapEntry = {
 
 const entries: SitemapEntry[] = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
-	...getProjectPageEntries().map(
-		({ slug }): SitemapEntry => ({
-			path: `/projects/${slug}`,
-			changefreq: 'monthly',
-			priority: '0.8'
-		})
-	)
+	...getProjectPageEntries().map(({ slug }): SitemapEntry => ({
+		path: `/projects/${slug}`,
+		changefreq: 'monthly',
+		priority: '0.8'
+	}))
 ];
 
 export const GET: RequestHandler = () => {

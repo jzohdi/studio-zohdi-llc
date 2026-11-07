@@ -1,2 +1,19 @@
+# Install scripts allowed to run. pnpm 11+ reads only allowBuilds (it replaced
+# onlyBuiltDependencies).
 allowBuilds:
   esbuild: true
+
+# Moved here from .npmrc: pnpm 11+ no longer reads engine-strict from a project .npmrc.
+engineStrict: true
+
+# Security overrides for dev/build-time packages (remove when upstream catches up):
+# - glob 13 (GHSA-3g3m, fixed 14.0.2), pulled by adapter-vercel's @vercel/nft. glob 14 is built
+#   for minimatch 11; glob 13 is not (its matchers silently match nothing under minimatch 11).
+# - minimatch 10 (GHSA-g3hv, fixed only in 11.0.1), pulled by eslint, @eslint/config-array and
+#   typescript-eslint. They only call minimatch() and Minimatch#match(), which 11 keeps. The
+#   selector catches only ^10 requests, so glob 14's own ^11 range still takes 11.x patches.
+# - cookie 0.6 (GHSA-pxg6, fixed 0.7.0), pinned by Kit 2.
+overrides:
+  '@vercel/nft>glob': 14.0.3
+  'minimatch@10': 11.0.4
+  '@sveltejs/kit>cookie': 0.7.2

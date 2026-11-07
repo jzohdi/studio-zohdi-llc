@@ -12,11 +12,17 @@ Studio Zohdi is a SvelteKit marketing and portfolio website for a freelance Soft
 
 ## Getting started
 
-This repository currently uses a `pnpm-lock.yaml`, so `pnpm` is the recommended package manager.
+Requires Node 24 (see `.nvmrc`) and pnpm 12, pinned in `package.json` (`packageManager`), so `corepack enable` picks the right version.
 
 ```sh
 pnpm install
 pnpm dev
+```
+
+The Remotion project in `remotion/` is a separate npm install with its own lockfile. Install it before running the `video:*` scripts:
+
+```sh
+npm ci --prefix remotion
 ```
 
 ## Scripts
@@ -65,7 +71,7 @@ The production target is Vercel through `@sveltejs/adapter-vercel`.
 pnpm build
 ```
 
-Current marketing routes are safe to prerender, which keeps deployment simple and fast.
+Current marketing routes are safe to prerender, which keeps deployment simple and fast. Because prerendered pages never pass through SvelteKit hooks, the security headers are set in `vercel.json` (`vite preview` doesn't apply them).
 
 ## Testing notes
 
